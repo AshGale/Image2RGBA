@@ -166,7 +166,7 @@ class Image2RGB {
 							individualPixel = new Color(buffImage.getRGB(j, i));
 							
 							//imageRaster.getPixel(j, i, pixel);
-							//alpha = pixel[3];//return 0 for alpha
+							//alpha = pixel[3];
 							
 							//TODO find a way to detect a empty pixel an keep perfect black
 							if(individualPixel.getRed() == 0 

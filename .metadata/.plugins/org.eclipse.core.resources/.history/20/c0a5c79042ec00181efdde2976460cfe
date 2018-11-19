@@ -166,19 +166,19 @@ class Image2RGB {
 							individualPixel = new Color(buffImage.getRGB(j, i));
 							
 							//imageRaster.getPixel(j, i, pixel);
-							//alpha = pixel[3];//return 0 for alpha
+							//alpha = pixel[3];
 							
 							//TODO find a way to detect a empty pixel an keep perfect black
-							if(individualPixel.getRed() == 0 
-									&& individualPixel.getGreen() == 0
-									&& individualPixel.getBlue() ==0
-									) {								
-							
-								//set pixel at location to empty
-								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-							}else {
+//							if(individualPixel.getRed() == 0 
+//									&& individualPixel.getGreen() == 0
+//									&& individualPixel.getBlue() ==0
+//									) {								
+//							
+//								//set pixel at location to empty
+//								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
+//								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
+//								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
+//							}else {
 								// RED
 								tempPixel = new Color(individualPixel.getRed(), 0, 0, individualPixel.getAlpha());
 								buffRed.setRGB(j, i, getIntFromColor(tempPixel.getRed(), 0, 0, tempPixel.getAlpha()));
@@ -190,7 +190,7 @@ class Image2RGB {
 								// BLUE
 								tempPixel = new Color(0, 0, individualPixel.getBlue(), individualPixel.getAlpha());
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, tempPixel.getBlue(), tempPixel.getAlpha()));
-							}
+							//}
 						}	
 						System.out.println("");					
 					}
