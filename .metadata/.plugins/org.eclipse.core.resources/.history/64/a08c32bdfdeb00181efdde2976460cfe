@@ -153,12 +153,10 @@ class Image2RGB {
 						for (int j = 0; j < imageWidth; j++) {
 
 							individualPixel = new Color(buffImage.getRGB(j, i));
-							
-							//TODO find a way to detect a empty pixel an keep perfect black
+							System.out.print(individualPixel.toString());
 							if(individualPixel.getRed() == 0 
 									&& individualPixel.getGreen() == 0
-									&& individualPixel.getBlue() ==0
-									) {
+									&& individualPixel.getBlue() ==0) {
 								System.out.println("empty space");
 								//set pixel at location to empty
 								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));

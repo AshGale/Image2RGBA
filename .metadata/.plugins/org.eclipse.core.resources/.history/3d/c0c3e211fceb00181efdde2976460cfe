@@ -153,32 +153,25 @@ class Image2RGB {
 						for (int j = 0; j < imageWidth; j++) {
 
 							individualPixel = new Color(buffImage.getRGB(j, i));
-							
-							//TODO find a way to detect a empty pixel an keep perfect black
-							if(individualPixel.getRed() == 0 
-									&& individualPixel.getGreen() == 0
-									&& individualPixel.getBlue() ==0
-									) {
-								System.out.println("empty space");
+							System.out.println(individualPixel.getAlpha());
+							if(individualPixel.getAlpha() == 255) {
 								//set pixel at location to empty
-								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-							}else {
-								// RED
-								tempPixel = new Color(individualPixel.getRed(), 0, 0, individualPixel.getAlpha());
-								buffRed.setRGB(j, i, getIntFromColor(tempPixel.getRed(), 0, 0, tempPixel.getAlpha()));
-
-								// GREEN
-								tempPixel = new Color(0, individualPixel.getGreen(), 0, individualPixel.getAlpha());
-								buffGreen.setRGB(j, i, getIntFromColor(0, tempPixel.getGreen(), 0, tempPixel.getAlpha()));
-
-								// BLUE
-								tempPixel = new Color(0, 0, individualPixel.getBlue(), individualPixel.getAlpha());
-								buffBlue.setRGB(j, i, getIntFromColor(0, 0, tempPixel.getBlue(), tempPixel.getAlpha()));
+								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, individualPixel.getAlpha()));
+								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, individualPixel.getAlpha()));
+								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, individualPixel.getAlpha()));
 							}
-							
-						}						
+							// RED
+							tempPixel = new Color(individualPixel.getRed(), 0, 0, individualPixel.getAlpha());
+							buffRed.setRGB(j, i, getIntFromColor(tempPixel.getRed(), 0, 0, tempPixel.getAlpha()));
+
+							// GREEN
+							tempPixel = new Color(0, individualPixel.getGreen(), 0, individualPixel.getAlpha());
+							buffGreen.setRGB(j, i, getIntFromColor(0, tempPixel.getGreen(), 0, tempPixel.getAlpha()));
+
+							// BLUE
+							tempPixel = new Color(0, 0, individualPixel.getBlue(), individualPixel.getAlpha());
+							buffBlue.setRGB(j, i, getIntFromColor(0, 0, tempPixel.getBlue(), tempPixel.getAlpha()));
+						}
 					}
 
 					// Save Images to path of selected file
