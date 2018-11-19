@@ -4,3 +4,7 @@
 1542619525531	Rename local variable 'green'
 1542619534689	Rename local variable 'blue'
 1542623797398	Rename field 'file'
+1542629023642	Rename field 'image'
+1542629034313	Rename field 'JlabelImage'
+1542629051555	Rename field 'img'
+1542629830689	Rename type 'Main'
