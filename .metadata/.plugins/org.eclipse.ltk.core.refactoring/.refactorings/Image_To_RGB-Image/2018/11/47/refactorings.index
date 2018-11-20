@@ -11,3 +11,9 @@
 1542663301609	Delete element
 1542663316787	Move file
 1542705970672	Rename local variable 'pixel'
+1542727364954	Rename local variable 'lastName'
+1542731893781	Rename local variable 'name'
+1542732118274	Rename local variable 'scalled'
+1542732210509	Rename local variable 'bimage'
+1542735237707	Rename local variable 'inputImage'
+1542735302224	Rename local variable 'outputImage'
