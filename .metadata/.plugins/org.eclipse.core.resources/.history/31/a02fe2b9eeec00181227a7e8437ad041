@@ -1,0 +1,2 @@
+Main-Class: main
+jar cmf manifest ExecutableJar.jar application-dir
