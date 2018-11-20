@@ -1,10 +1,8 @@
 package main;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,7 +46,7 @@ class Image2RGB {
 	private JFrame jFrame;
 	private JMenu jmenu;
 	private JMenuBar jbar;
-	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale;
+	private JMenuItem jOpen, jExit, jRGB, jScale;
 	private JPanel jpanel;
 	private File imageFile = null;
 	private JLabel jlabelImage;
@@ -125,19 +123,15 @@ class Image2RGB {
 					// file-replace-or-withTimeStamp)
 					// TODO support JPEG and non alpha file formats
 
-					File imageProcessing = new File(path + "\\ImageProcessing"); // in Windows
-					File rgb = new File(path + "\\ImageProcessing\\Rgb"); // in Windows
+					File imageProcessing = new File(path + "\\ImageProcessing\\"); // in Windows
 
 					if (!imageProcessing.exists()) {
 						imageProcessing.mkdir();
 					}
-					if (!rgb.exists()) {
-						rgb.mkdir();
-					}
 
-					File redImg = new File(path + "\\ImageProcessing\\Rgb\\_red.png"); // in Windows
-					File greenImg = new File(path + "\\ImageProcessing\\Rgb\\_green.png"); // in Windows
-					File blueImg = new File(path + "\\ImageProcessing\\Rgb\\_blue.png"); // in Windows
+					File redImg = new File(path + "\\ImageProcessing\\_red.png"); // in Windows
+					File greenImg = new File(path + "\\ImageProcessing\\_green.png"); // in Windows
+					File blueImg = new File(path + "\\ImageProcessing\\_blue.png"); // in Windows
 
 					// deal with file IO is exists ect
 					if (redImg.exists() || greenImg.exists() || blueImg.exists()) {
@@ -156,10 +150,10 @@ class Image2RGB {
 							}
 						} else if (inputOption == 1) {// No
 
-							redImg = new File(path + "\\ImageProcessing\\Rgb\\" + System.currentTimeMillis() + "_red.png");
+							redImg = new File(path + "\\ImageProcessing\\" + System.currentTimeMillis() + "_red.png");
 							greenImg = new File(
-									path + "\\ImageProcessing\\Rgb\\" + System.currentTimeMillis() + "_green.png");
-							blueImg = new File(path + "\\ImageProcessing\\Rgb\\" + System.currentTimeMillis() + "_blue.png");
+									path + "\\ImageProcessing\\" + System.currentTimeMillis() + "_green.png");
+							blueImg = new File(path + "\\ImageProcessing\\" + System.currentTimeMillis() + "_blue.png");
 						} // end import option
 
 					} // end if files exist
@@ -198,18 +192,26 @@ class Image2RGB {
 								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 							} else if (pixelRGBA[3] == 0) {// check if file supports alpha
-								
+								// RED
 								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, 255));
+
+								// GREEN
 								buffGreen.setRGB(j, i, getIntFromColor(0, pixelRGBA[1], 0, 255));
+
+								// BLUE
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, pixelRGBA[2], 255));
 							} else {
-								
+								// RED
 								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, pixelRGBA[3]));
+
+								// GREEN
 								buffGreen.setRGB(j, i, getIntFromColor(0, pixelRGBA[1], 0, pixelRGBA[3]));
+
+								// BLUE
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, pixelRGBA[2], pixelRGBA[3]));
 							}
 						}
-					}//end nested loop
+					}
 
 					// Save Images to path of selected file
 					try {
@@ -224,7 +226,7 @@ class Image2RGB {
 
 					JOptionPane.showMessageDialog(null, "All Done");
 					try {
-						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\Rgb");
+						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -267,7 +269,8 @@ class Image2RGB {
 						int result = JOptionPane.showConfirmDialog(null, inputs, "Output Image size",
 								JOptionPane.PLAIN_MESSAGE);
 						if (result == JOptionPane.OK_OPTION) {
-							
+							System.out.println(
+									"Output image dimentions: " + newWidth.getText() + " x " + newHeight.getText());
 							outputWidth = Integer.parseInt(newWidth.getText());// ensured number format with formatter
 							outputHeight = Integer.parseInt(newHeight.getText());// ensured number format with formatter
 						} else {
@@ -286,8 +289,8 @@ class Image2RGB {
 					if (!scaled.exists()) {
 						scaled.mkdir();
 					}
-
-					// Make file and determine file name
+					
+					//Make file and determine file name
 					String fileName = imageFile.getName();
 					if (fileName.contains("."))
 						fileName = fileName.substring(0, fileName.indexOf("."));
@@ -295,27 +298,26 @@ class Image2RGB {
 							+ outputWidth + "x" + outputHeight + ".png");
 
 					// convert image to scaled version
-					BufferedImage buffInputImage = null;
+			        BufferedImage buffInputImage = null;
 					try {
 						buffInputImage = ImageIO.read(imageFile);
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-
-					BufferedImage buffOutputImage = new BufferedImage(outputWidth, outputHeight,
-							BufferedImage.TYPE_INT_ARGB);
-
-					// scales the input image to the output image
-					Graphics2D g2d = buffOutputImage.createGraphics();
-					g2d.drawImage(buffInputImage, 0, 0, outputWidth, outputHeight, null);
-					g2d.dispose();
+			 
+			        BufferedImage buffOutputImage = new BufferedImage(outputWidth, outputHeight,BufferedImage.TYPE_INT_ARGB);
+			 
+			        // scales the input image to the output image
+			        Graphics2D g2d = buffOutputImage.createGraphics();
+			        g2d.drawImage(buffInputImage, 0, 0, outputWidth, outputHeight, null);
+			        g2d.dispose();			       
 
 					try {
 						ImageIO.write(buffOutputImage, "png", outputfile);
 					} catch (IOException e) {
 
-						JOptionPane.showMessageDialog(null, "Failed to create Scaled file");
+						JOptionPane.showMessageDialog(null, "Failed to create RGB files");
 						e.printStackTrace();
 					}
 
@@ -331,67 +333,6 @@ class Image2RGB {
 		});
 		// -----------------------------------------------------------------
 
-		jGreyScale = new JMenuItem("Grey Scale");
-		jGreyScale.setFont(font);
-		jGreyScale.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				// If Image selected already
-				if (image == null) {
-					jOpen.doClick();
-					jScale.doClick();
-				} else {
-					
-					File imageProcessing = new File(path + "\\ImageProcessing"); // in Windows
-					File greyScale = new File(path + "\\ImageProcessing\\Grey_Scale"); // in Windows
-
-					if (!imageProcessing.exists()) {
-						imageProcessing.mkdir();
-					}
-					if (!greyScale.exists()) {
-						greyScale.mkdir();
-					}
-					
-					String fileName = imageFile.getName();
-					if (fileName.contains("."))
-						fileName = fileName.substring(0, fileName.indexOf("."));
-					File greyScaleImage = new File(path + "\\ImageProcessing\\Grey_Scale\\"+fileName+"_Greyscale.png");
-					
-					// convert image to Greyscal version
-					BufferedImage buffInputImage = null;
-					try {
-						buffInputImage = ImageIO.read(imageFile);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
-					BufferedImage buffOutputImage = new BufferedImage(image.getWidth(), image.getHeight(),
-							BufferedImage.TYPE_BYTE_GRAY);
-					
-					Graphics g = buffOutputImage.getGraphics();  
-					g.drawImage(buffInputImage, 0, 0, null);  
-					g.dispose();
-					
-					try {
-						ImageIO.write(buffOutputImage, "png", greyScaleImage);
-					} catch (IOException e) {
-
-						JOptionPane.showMessageDialog(null, "Failed to create Greyscale file");
-						e.printStackTrace();
-					}
-
-					JOptionPane.showMessageDialog(null, "All Done");
-					try {
-						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\Grey_Scale");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					
-				}
-			}
-		});
-		// -----------------------------------------------------------------
-
 		jExit = new JMenuItem("Exit");
 		jExit.setFont(font);
 		jExit.addActionListener(new ActionListener() {
@@ -402,7 +343,6 @@ class Image2RGB {
 
 		jmenu.add(jOpen);
 		jmenu.add(jRGB);
-		jmenu.add(jGreyScale);
 		jmenu.add(jScale);
 		jmenu.add(jExit);
 		jbar.add(jmenu);

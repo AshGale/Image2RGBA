@@ -18,3 +18,4 @@
 1542735237707	Rename local variable 'inputImage'
 1542735302224	Rename local variable 'outputImage'
 1542736950832	Move compilation unit
+1542743592239	Rename local variable 'rgb'

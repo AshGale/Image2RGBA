@@ -267,7 +267,8 @@ class Image2RGB {
 						int result = JOptionPane.showConfirmDialog(null, inputs, "Output Image size",
 								JOptionPane.PLAIN_MESSAGE);
 						if (result == JOptionPane.OK_OPTION) {
-							
+							System.out.println(
+									"Output image dimentions: " + newWidth.getText() + " x " + newHeight.getText());
 							outputWidth = Integer.parseInt(newWidth.getText());// ensured number format with formatter
 							outputHeight = Integer.parseInt(newHeight.getText());// ensured number format with formatter
 						} else {

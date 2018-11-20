@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -136,8 +135,8 @@ class Image2RGB {
 					}
 
 					File redImg = new File(path + "\\ImageProcessing\\Rgb\\_red.png"); // in Windows
-					File greenImg = new File(path + "\\ImageProcessing\\Rgb\\_green.png"); // in Windows
-					File blueImg = new File(path + "\\ImageProcessing\\Rgb\\_blue.png"); // in Windows
+					File greenImg = new File(path + "\\ImageProcessing\\Rgb\\\\_green.png"); // in Windows
+					File blueImg = new File(path + "\\ImageProcessing\\Rgb\\\\_blue.png"); // in Windows
 
 					// deal with file IO is exists ect
 					if (redImg.exists() || greenImg.exists() || blueImg.exists()) {
@@ -156,10 +155,10 @@ class Image2RGB {
 							}
 						} else if (inputOption == 1) {// No
 
-							redImg = new File(path + "\\ImageProcessing\\Rgb\\" + System.currentTimeMillis() + "_red.png");
+							redImg = new File(path + "\\ImageProcessing\\Rgb\\\\Rgb\\\\" + System.currentTimeMillis() + "_red.png");
 							greenImg = new File(
-									path + "\\ImageProcessing\\Rgb\\" + System.currentTimeMillis() + "_green.png");
-							blueImg = new File(path + "\\ImageProcessing\\Rgb\\" + System.currentTimeMillis() + "_blue.png");
+									path + "\\ImageProcessing\\Rgb\\\\" + System.currentTimeMillis() + "_green.png");
+							blueImg = new File(path + "\\ImageProcessing\\Rgb\\\\" + System.currentTimeMillis() + "_blue.png");
 						} // end import option
 
 					} // end if files exist
@@ -224,7 +223,7 @@ class Image2RGB {
 
 					JOptionPane.showMessageDialog(null, "All Done");
 					try {
-						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\Rgb");
+						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -267,7 +266,8 @@ class Image2RGB {
 						int result = JOptionPane.showConfirmDialog(null, inputs, "Output Image size",
 								JOptionPane.PLAIN_MESSAGE);
 						if (result == JOptionPane.OK_OPTION) {
-							
+							System.out.println(
+									"Output image dimentions: " + newWidth.getText() + " x " + newHeight.getText());
 							outputWidth = Integer.parseInt(newWidth.getText());// ensured number format with formatter
 							outputHeight = Integer.parseInt(newHeight.getText());// ensured number format with formatter
 						} else {
@@ -315,7 +315,7 @@ class Image2RGB {
 						ImageIO.write(buffOutputImage, "png", outputfile);
 					} catch (IOException e) {
 
-						JOptionPane.showMessageDialog(null, "Failed to create Scaled file");
+						JOptionPane.showMessageDialog(null, "Failed to create RGB files");
 						e.printStackTrace();
 					}
 
@@ -331,7 +331,7 @@ class Image2RGB {
 		});
 		// -----------------------------------------------------------------
 
-		jGreyScale = new JMenuItem("Grey Scale");
+		jGreyScale = new JMenuItem("Exit");
 		jGreyScale.setFont(font);
 		jGreyScale.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -341,8 +341,8 @@ class Image2RGB {
 					jScale.doClick();
 				} else {
 					
-					File imageProcessing = new File(path + "\\ImageProcessing"); // in Windows
-					File greyScale = new File(path + "\\ImageProcessing\\Grey_Scale"); // in Windows
+					File imageProcessing = new File(path + "\\ImageProcessing\\"); // in Windows
+					File greyScale = new File(path + "\\ImageProcessing\\"); // in Windows
 
 					if (!imageProcessing.exists()) {
 						imageProcessing.mkdir();
@@ -351,10 +351,7 @@ class Image2RGB {
 						greyScale.mkdir();
 					}
 					
-					String fileName = imageFile.getName();
-					if (fileName.contains("."))
-						fileName = fileName.substring(0, fileName.indexOf("."));
-					File greyScaleImage = new File(path + "\\ImageProcessing\\Grey_Scale\\"+fileName+"_Greyscale.png");
+					File redImg = new File(path + "\\ImageProcessing\\Rgb\\_red.png");
 					
 					// convert image to Greyscal version
 					BufferedImage buffInputImage = null;
@@ -367,25 +364,6 @@ class Image2RGB {
 
 					BufferedImage buffOutputImage = new BufferedImage(image.getWidth(), image.getHeight(),
 							BufferedImage.TYPE_BYTE_GRAY);
-					
-					Graphics g = buffOutputImage.getGraphics();  
-					g.drawImage(buffInputImage, 0, 0, null);  
-					g.dispose();
-					
-					try {
-						ImageIO.write(buffOutputImage, "png", greyScaleImage);
-					} catch (IOException e) {
-
-						JOptionPane.showMessageDialog(null, "Failed to create Greyscale file");
-						e.printStackTrace();
-					}
-
-					JOptionPane.showMessageDialog(null, "All Done");
-					try {
-						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\Grey_Scale");
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
 					
 				}
 			}
