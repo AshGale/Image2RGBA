@@ -165,8 +165,6 @@ class Image2RGB {
 							
 							imageRaster.getPixel(j, i, pixelRGBA);
 							
-							//System.out.println(j+","+i+" =>"+pixelRGBA[0]+" "+pixelRGBA[1]+" "+pixelRGBA[2]+" "+pixelRGBA[3]);
-							
 							if(pixelRGBA[0] == 0 && pixelRGBA[1] == 0 && pixelRGBA[2] ==0
 									&& pixelRGBA[3] == 0) {								
 							
@@ -174,15 +172,6 @@ class Image2RGB {
 								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
-							}else if(pixelRGBA[3] == 0){//check if file supports alpha
-								// RED
-								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, 255));
-
-								// GREEN
-								buffGreen.setRGB(j, i, getIntFromColor(0, pixelRGBA[1], 0, 255));
-
-								// BLUE
-								buffBlue.setRGB(j, i, getIntFromColor(0, 0, pixelRGBA[2], 255));
 							}else {
 								// RED
 								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, pixelRGBA[3]));
