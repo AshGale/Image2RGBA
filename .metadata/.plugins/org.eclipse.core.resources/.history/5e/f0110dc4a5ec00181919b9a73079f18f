@@ -105,16 +105,16 @@ class Image2RGB {
 		jRGB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 
+				File redImg = new File(path + "\\_red.png"); // in Windows
+				File greenImg = new File(path + "\\_green.png"); // in Windows
+				File blueImg = new File(path + "\\_blue.png"); // in Windows
+
 				// If Image selected already
 				if (image == null) {
 					jOpen.doClick();
 					jRGB.doClick();
 				} else {
 
-					File redImg = new File(path + "\\_red.png"); // in Windows
-					File greenImg = new File(path + "\\_green.png"); // in Windows
-					File blueImg = new File(path + "\\_blue.png"); // in Windows
-					
 					// deal with file IO is exists ect
 					if (redImg.exists() || greenImg.exists() || blueImg.exists()) {
 						int inputOption = JOptionPane.showConfirmDialog(null, "Replace RGB files?",
@@ -149,21 +149,34 @@ class Image2RGB {
 
 					int imageHeight = buffImage.getHeight();
 					int imageWidth = buffImage.getWidth();
-					
+					Color individualPixel = null;
+					Color tempPixel = null;
+
 					BufferedImage buffRed = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 					BufferedImage buffGreen = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 					BufferedImage buffBlue = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 					
-					WritableRaster imageRaster = buffImage.getRaster();
-					int[] pixelRGBA = new int[4];
+					WritableRaster imageRaster = buffImage.getAlphaRaster();
+					int[] pixel = new int[4];
+					int alpha = 0;
 					
 					for (int i = 0; i < imageHeight; i++) {
 						for (int j = 0; j < imageWidth; j++) {
+
+							individualPixel = new Color(buffImage.getRGB(j, i));
 							
-							imageRaster.getPixel(j, i, pixelRGBA);
+							imageRaster.getPixel(j, i, pixel);
+							alpha = pixel[0];//return 0 for alpha
 							
-							if(pixelRGBA[0] == 0 && pixelRGBA[1] == 0 && pixelRGBA[2] ==0
-									&& pixelRGBA[3] == 0) {								
+							//if(individualPixel.getAlpha() <255 || alpha >0)
+								System.out.println(j + "," + i + " : " + individualPixel.getAlpha()+ "-"+alpha+ " =>" +
+										pixel[0] + " " + pixel[1] + " " + pixel[2] + " " + pixel[3]);
+							
+							//TODO find a way to detect a empty pixel an keep perfect black
+							if(individualPixel.getRed() == 0 
+									&& individualPixel.getGreen() == 0
+									&& individualPixel.getBlue() ==0
+									& alpha == 0) {								
 							
 								//set pixel at location to empty
 								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
@@ -171,15 +184,19 @@ class Image2RGB {
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 							}else {
 								// RED
-								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, pixelRGBA[3]));
+								tempPixel = new Color(individualPixel.getRed(), 0, 0, individualPixel.getAlpha());
+								buffRed.setRGB(j, i, getIntFromColor(tempPixel.getRed(), 0, 0, tempPixel.getAlpha()));
 
 								// GREEN
-								buffGreen.setRGB(j, i, getIntFromColor(0, pixelRGBA[1], 0, pixelRGBA[3]));
+								tempPixel = new Color(0, individualPixel.getGreen(), 0, individualPixel.getAlpha());
+								buffGreen.setRGB(j, i, getIntFromColor(0, tempPixel.getGreen(), 0, tempPixel.getAlpha()));
 
 								// BLUE
-								buffBlue.setRGB(j, i, getIntFromColor(0, 0, pixelRGBA[2], pixelRGBA[3]));
+								tempPixel = new Color(0, 0, individualPixel.getBlue(), individualPixel.getAlpha());
+								buffBlue.setRGB(j, i, getIntFromColor(0, 0, tempPixel.getBlue(), tempPixel.getAlpha()));
 							}
-						}				
+						}	
+						System.out.println("");					
 					}
 
 					// Save Images to path of selected file

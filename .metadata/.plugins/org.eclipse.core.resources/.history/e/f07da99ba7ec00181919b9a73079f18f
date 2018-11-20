@@ -105,16 +105,16 @@ class Image2RGB {
 		jRGB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 
+				File redImg = new File(path + "\\_red.png"); // in Windows
+				File greenImg = new File(path + "\\_green.png"); // in Windows
+				File blueImg = new File(path + "\\_blue.png"); // in Windows
+
 				// If Image selected already
 				if (image == null) {
 					jOpen.doClick();
 					jRGB.doClick();
 				} else {
 
-					File redImg = new File(path + "\\_red.png"); // in Windows
-					File greenImg = new File(path + "\\_green.png"); // in Windows
-					File blueImg = new File(path + "\\_blue.png"); // in Windows
-					
 					// deal with file IO is exists ect
 					if (redImg.exists() || greenImg.exists() || blueImg.exists()) {
 						int inputOption = JOptionPane.showConfirmDialog(null, "Replace RGB files?",
