@@ -49,6 +49,8 @@ class Image2RGB {
 	Image2RGB() {
 		jFrame = new JFrame("Convert Image to RGB Files");
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// j.setExtendedState(Frame.MAXIMIZED_BOTH);
+		// j.setLocationRelativeTo(null);
 		jFrame.setLocationByPlatform(true);
 		jFrame.setLayout(new GridBagLayout());
 		jFrame.setMinimumSize(new Dimension(640, 640));
@@ -107,13 +109,8 @@ class Image2RGB {
 				if (image == null) {
 					jOpen.doClick();
 					jRGB.doClick();
-				} else {					
-					
-					//TODO make jar or class to be reused
-					//requires getIntFromColor function
-					//pass in (String image-file)(String outputFolder)(boolean file-replace-or-withTimeStamp)
-					//TODO support JPEG and non alpha file formats
-					
+				} else {
+
 					File redImg = new File(path + "\\_red.png"); // in Windows
 					File greenImg = new File(path + "\\_green.png"); // in Windows
 					File blueImg = new File(path + "\\_blue.png"); // in Windows

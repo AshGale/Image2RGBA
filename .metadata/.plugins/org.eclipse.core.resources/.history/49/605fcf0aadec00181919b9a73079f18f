@@ -112,7 +112,6 @@ class Image2RGB {
 					//TODO make jar or class to be reused
 					//requires getIntFromColor function
 					//pass in (String image-file)(String outputFolder)(boolean file-replace-or-withTimeStamp)
-					//TODO support JPEG and non alpha file formats
 					
 					File redImg = new File(path + "\\_red.png"); // in Windows
 					File greenImg = new File(path + "\\_green.png"); // in Windows
