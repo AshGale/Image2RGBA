@@ -19,3 +19,10 @@
 1542735302224	Rename local variable 'outputImage'
 1542736950832	Move compilation unit
 1542743592239	Rename local variable 'rgb'
+1542748305436	Rename method 'getImageBuffered'
+1542748648921	Rename local variable 'buffRed'
+1542748673430	Rename local variable 'string'
+1542748689206	Rename local variable 'redImg'
+1542748790973	Rename local variable 'string'
+1542749058700	Rename method 'generateFileName'
+1542749245171	Rename method 'getMainBuffImage'

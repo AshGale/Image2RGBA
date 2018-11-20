@@ -87,9 +87,9 @@ class Image2RGB {
 				JFileChooser fc = new JFileChooser(path);
 				int result = fc.showOpenDialog(null);
 
-				// Ensure File structure set up
+				//Ensure File structure set up
 				setupfileStructure();
-
+				
 				if (result == JFileChooser.APPROVE_OPTION) {
 					imageFile = fc.getSelectedFile();
 					try {
@@ -114,15 +114,15 @@ class Image2RGB {
 					jOpen.doClick();
 					jRGB.doClick();
 				} else {
-
-					// set up output files
+					
+					//set up output files
 					File redImg = generateFile("Rgb", "red");
 					File greenImg = generateFile("Rgb", "green");
-					File blueImg = generateFile("Rgb", "blue");
+					File blueImg = generateFile("Rgb", "blue");	
 
-					// get RGB from image
-					BufferedImage buffImage = getMainImageBuffered();
-
+					// get RGB from image					
+					BufferedImage buffImage = getMainBuffImage();
+					
 					int imageHeight = buffImage.getHeight();
 					int imageWidth = buffImage.getWidth();
 
@@ -141,34 +141,34 @@ class Image2RGB {
 							// System.out.println(j+","+i+" =>"+pixelRGBA[0]+" "+pixelRGBA[1]+"
 							// "+pixelRGBA[2]+" "+pixelRGBA[3]);
 
-							if (pixelRGBA[3] == 0 && pixelRGBA[0] == 0 && pixelRGBA[1] == 0 && pixelRGBA[2] == 0) {
+							if (pixelRGBA[3] == 0 && pixelRGBA[0] == 0 && pixelRGBA[1] == 0 && pixelRGBA[2] == 0 ) {
 
 								// set pixel at location to empty
 								buffRed.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 								buffGreen.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, 0, 0));
 							} else if (pixelRGBA[3] == 0) {// check if file supports alpha
-
+								
 								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, 255));
 								buffGreen.setRGB(j, i, getIntFromColor(0, pixelRGBA[1], 0, 255));
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, pixelRGBA[2], 255));
 							} else {
-
+								
 								buffRed.setRGB(j, i, getIntFromColor(pixelRGBA[0], 0, 0, pixelRGBA[3]));
 								buffGreen.setRGB(j, i, getIntFromColor(0, pixelRGBA[1], 0, pixelRGBA[3]));
 								buffBlue.setRGB(j, i, getIntFromColor(0, 0, pixelRGBA[2], pixelRGBA[3]));
 							}
 						}
-					} // end nested loop
+					}//end nested loop
 
 					// Save Images to path of selected file
-					savImageFile(buffRed, "png", redImg);
+					savImageFile(buffRed,"png", redImg);
 					savImageFile(buffGreen, "png", greenImg);
 					savImageFile(buffBlue, "png", blueImg);
-
+					
 					JOptionPane.showMessageDialog(null, "All Done");
-
-					openNewFileLocation("Rgb");
+					
+					openNewFileLocation("Rgb");					
 
 				}
 			}// end action performed
@@ -208,7 +208,7 @@ class Image2RGB {
 						int result = JOptionPane.showConfirmDialog(null, inputs, "Output Image size",
 								JOptionPane.PLAIN_MESSAGE);
 						if (result == JOptionPane.OK_OPTION) {
-
+							
 							outputWidth = Integer.parseInt(newWidth.getText());// ensured number format with formatter
 							outputHeight = Integer.parseInt(newHeight.getText());// ensured number format with formatter
 						} else {
@@ -218,10 +218,19 @@ class Image2RGB {
 					} // end if output dimensions 0
 
 					// Make file and determine file name
-					File outputfile = generateFile("Scaled", "scaled_" + outputWidth + "x" + outputHeight);
+					String fileName = imageFile.getName();
+					if (fileName.contains("."))
+						fileName = fileName.substring(0, fileName.indexOf("."));
+					File outputfile = new File(path + "\\ImageProcessing\\Scaled\\" + fileName + "_scaled_"
+							+ outputWidth + "x" + outputHeight + ".png");
 
 					// convert image to scaled version
-					BufferedImage buffInputImage = getMainImageBuffered();
+					BufferedImage buffInputImage = null;
+					try {
+						buffInputImage = ImageIO.read(imageFile);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 
 					BufferedImage buffOutputImage = new BufferedImage(outputWidth, outputHeight,
 							BufferedImage.TYPE_INT_ARGB);
@@ -231,11 +240,20 @@ class Image2RGB {
 					g2d.drawImage(buffInputImage, 0, 0, outputWidth, outputHeight, null);
 					g2d.dispose();
 
-					savImageFile(buffOutputImage, "png", outputfile);
+					try {
+						ImageIO.write(buffOutputImage, "png", outputfile);
+					} catch (IOException e) {
+
+						JOptionPane.showMessageDialog(null, "Failed to create Scaled file");
+						e.printStackTrace();
+					}
 
 					JOptionPane.showMessageDialog(null, "All Done");
-
-					openNewFileLocation("Scaled");
+					try {
+						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\Scaled");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 
 				} // end if image null
 			}
@@ -251,24 +269,42 @@ class Image2RGB {
 					jOpen.doClick();
 					jGreyScale.doClick();
 				} else {
-
-					File greyScaleImage = generateFile("Grey_Scale", "Greyscale");
-
+					
+					String fileName = imageFile.getName();
+					if (fileName.contains("."))
+						fileName = fileName.substring(0, fileName.indexOf("."));
+					File greyScaleImage = new File(path + "\\ImageProcessing\\Grey_Scale\\"+fileName+"_Greyscale.png");
+					
 					// convert image to Greyscal version
-					BufferedImage buffInputImage = getMainImageBuffered();
+					BufferedImage buffInputImage = null;
+					try {
+						buffInputImage = ImageIO.read(imageFile);
+					} catch (IOException e1) {					
+						e1.printStackTrace();
+					}
 
 					BufferedImage buffOutputImage = new BufferedImage(image.getWidth(), image.getHeight(),
 							BufferedImage.TYPE_BYTE_GRAY);
-
-					Graphics g = buffOutputImage.getGraphics();
-					g.drawImage(buffInputImage, 0, 0, null);
+					
+					Graphics g = buffOutputImage.getGraphics();  
+					g.drawImage(buffInputImage, 0, 0, null);  
 					g.dispose();
+					
+					try {
+						ImageIO.write(buffOutputImage, "png", greyScaleImage);
+					} catch (IOException e) {
 
-					savImageFile(buffOutputImage, "png", greyScaleImage);
+						JOptionPane.showMessageDialog(null, "Failed to create Greyscale file");
+						e.printStackTrace();
+					}
 
 					JOptionPane.showMessageDialog(null, "All Done");
-
-					openNewFileLocation("Grey_Scale");
+					try {
+						Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\Grey_Scale");
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
 				}
 			}
 		});
@@ -297,11 +333,11 @@ class Image2RGB {
 
 	protected void openNewFileLocation(String fileFolderLocation) {
 		try {
-			Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
+			Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\"+fileFolderLocation);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
 
 	protected void savImageFile(BufferedImage bufferReader, String fileFormat, File file) {
@@ -312,10 +348,10 @@ class Image2RGB {
 			JOptionPane.showMessageDialog(null, "Failed to create RGB files");
 			e.printStackTrace();
 		}
-
+		
 	}
 
-	private BufferedImage getMainImageBuffered() {
+	private BufferedImage getMainBuffImage() {
 
 		BufferedImage buffImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
@@ -330,19 +366,19 @@ class Image2RGB {
 		String name = imageFile.getName();
 		if (name.contains("."))
 			name = name.substring(0, name.indexOf("."));
-		name += name + "_";
-
-		return new File(path + "\\ImageProcessing\\" + folderPrefix + "\\" + name + fileName + ".png");
-
+		name+=name+"_";
+		
+		return new File(path + "\\ImageProcessing\\"+folderPrefix+"\\"+ name+ fileName + ".png");
+		
 	}
 
 	private void setupfileStructure() {
-
-		File imageProcessing = new File(path + "\\ImageProcessing");
-		File rgb = new File(path + "\\ImageProcessing\\Rgb");
+		
+		File imageProcessing = new File(path + "\\ImageProcessing"); 
+		File rgb = new File(path + "\\ImageProcessing\\Rgb"); 
 		File scaled = new File(path + "\\ImageProcessing\\Scaled");
 		File greyScale = new File(path + "\\ImageProcessing\\Grey_Scale");
-
+		
 		if (!imageProcessing.exists()) {
 			imageProcessing.mkdir();
 		}
@@ -355,7 +391,7 @@ class Image2RGB {
 		if (!scaled.exists()) {
 			scaled.mkdir();
 		}
-
+		
 	}
 
 	private int getIntFromColor(int R, int G, int B, int A) {
