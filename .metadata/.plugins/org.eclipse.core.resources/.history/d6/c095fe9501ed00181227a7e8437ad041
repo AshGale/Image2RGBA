@@ -338,7 +338,7 @@ class Image2RGB {
 				// If Image selected already
 				if (image == null) {
 					jOpen.doClick();
-					jGreyScale.doClick();
+					jScale.doClick();
 				} else {
 					
 					File imageProcessing = new File(path + "\\ImageProcessing"); // in Windows
