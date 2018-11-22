@@ -35,21 +35,21 @@ import javax.swing.text.NumberFormatter;
 
 /**
  * 
- * @author Ash ProtoType - need to tidy up and optimise
+ * @author Ash
  */
 
 class Image2RGB {
 	private JFrame jFrame;
-	private JMenu jmenuFile,jmenuSettings;
+	private JMenu jmenuFile, jmenuSettings;
 	private JMenuBar jbar;
-	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge,jviewOnFinshed,jreplaceWithLastJob;
+	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge, jviewOnFinshed, jreplaceWithLastJob;
 	private JPanel jpanel;
 	private File imageFile = null;
 	private JLabel jlabelImage;
 	private BufferedImage image;
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
-	
+
 	Boolean viewOnJobFinished = true;
 	Boolean replaceWithLastJob = false;
 
@@ -60,23 +60,12 @@ class Image2RGB {
 		jFrame.setLayout(new GridBagLayout());
 		jFrame.setMinimumSize(new Dimension(640, 640));
 
-		GridBagConstraints gridBag = new GridBagConstraints();
 		jpanel = new JPanel();
 		jpanel.setLayout(new BorderLayout());
 		jlabelImage = new JLabel(" ");
 		jpanel.add(jlabelImage, BorderLayout.CENTER);
-		// jpanel.setPreferredSize(new Dimension(400,400));
 
-		gridBag.anchor = GridBagConstraints.PAGE_START;
-		gridBag.fill = GridBagConstraints.HORIZONTAL;
-		gridBag.gridx = gridBag.gridy = 0;
-		gridBag.gridwidth = 2;
-		// c.weightx=0.1;
-		gridBag.weighty = 0.1;
-		gridBag.ipady = 0;
-		gridBag.insets = new Insets(5, 5, 10, 5);
-		// jpanel.setBackground(Color.BLACK);//no suitable for images with transparency
-		jFrame.add(jpanel, gridBag);
+		jFrame.add(jpanel);
 
 		// Creating Menu
 		jbar = new JMenuBar();
@@ -87,60 +76,55 @@ class Image2RGB {
 		jmenuSettings.setFont(font);
 
 		// *****************************************************************************************
-		jviewOnFinshed = new JMenuItem("View on Finished (" + viewOnJobFinished+")");
+		jviewOnFinshed = new JMenuItem("View on Finished (" + viewOnJobFinished + ")");
 		jviewOnFinshed.setFont(font);
 		jviewOnFinshed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				int inputOption = JOptionPane.showConfirmDialog(null, "Open File Explorer after \"All Done\"?", "View on job finished",
-						JOptionPane.YES_NO_OPTION);
-				if(inputOption == JOptionPane.YES_OPTION) {
-					viewOnJobFinished = true;
-				}
-				else {
-					viewOnJobFinished = false;
-				}
-				jviewOnFinshed.setText("View on Finished (" + viewOnJobFinished+")");
-				jFrame.pack();
+				viewOnJobFinished = !viewOnJobFinished;
+				jviewOnFinshed.setText("View on Finished (" + viewOnJobFinished + ")");
 			}
 		});
-		
+
 		// -----------------------------------------------------------------
-		jreplaceWithLastJob = new JMenuItem("Load last processed image (" + replaceWithLastJob+")");
+		jreplaceWithLastJob = new JMenuItem("Load last processed image (" + replaceWithLastJob + ")");
 		jreplaceWithLastJob.setFont(font);
 		jreplaceWithLastJob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				int inputOption = JOptionPane.showConfirmDialog(null, "Replace the Active image, with the Image just procced?", "Load last processed image",
-						JOptionPane.YES_NO_OPTION);
-				if(inputOption == JOptionPane.YES_OPTION) {
-					replaceWithLastJob = true;
-				}
-				else {
-					replaceWithLastJob = false;
-				}
-				jreplaceWithLastJob.setText("Load last processed image (" + replaceWithLastJob+")");
-				jFrame.pack();
+				replaceWithLastJob = !replaceWithLastJob;
+				jreplaceWithLastJob.setText("Load last processed image (" + replaceWithLastJob + ")");
 			}
 		});
-		
+
 		// *****************************************************************************************
-		
+
 		jOpen = new JMenuItem("Open");
 		jOpen.setFont(font);
 		jOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				JFileChooser fc = new JFileChooser(path);
-				int result = fc.showOpenDialog(null);
+				
+				//find check if called from other actionPerformed even.
+				//	fix loop until select valid image file
+				//if(ae.getSource().equals(jEdge))
+//				System.out.println("source is:"+ae.getSource().getClass());
+//				System.out.println("source is:"+ae.getActionCommand());
+//				System.out.println("source is:"+ae.getID());
+//				System.out.println("source is:"+ae.INPUT_METHOD_EVENT_MASK);
+				
+				JFileChooser fileChooser = new JFileChooser(path);
+				int result = fileChooser.showOpenDialog(null);
 
-				// Ensure File structure set up
+				// Ensure File structure set up 
 				setupfileStructure();
 
 				if (result == JFileChooser.APPROVE_OPTION) {
-					imageFile = fc.getSelectedFile();
+					
+					imageFile = fileChooser.getSelectedFile();
 					try {
 						jlabelImage.setIcon(new ImageIcon(ImageIO.read(imageFile)));
 						image = ImageIO.read(imageFile);
 						jFrame.pack();
-					} catch (IOException e) {
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Please ensure your selection is an image!");
 						e.printStackTrace();
 					}
 				}
@@ -211,7 +195,7 @@ class Image2RGB {
 					savImageFile(buffBlue, "png", blueImg);
 
 					JOptionPane.showMessageDialog(null, "All Done");
-						
+
 					openNewFileLocation("Rgb");
 
 				}
@@ -290,7 +274,7 @@ class Image2RGB {
 		jGreyScale.setFont(font);
 		jGreyScale.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				
+
 				// If Image selected already
 				if (image == null) {
 					jOpen.doClick();
@@ -323,7 +307,7 @@ class Image2RGB {
 		jEdge.setFont(font);
 		jEdge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				
+
 				// If Image selected already
 				if (image == null) {
 					jOpen.doClick();
@@ -334,38 +318,36 @@ class Image2RGB {
 
 					// convert image to Edges version
 					BufferedImage inputBuffImage = getMainImageBuffered();
-					
+
 					int[][] filter1 = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
 
 					int[][] filter2 = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
 
 					int width = inputBuffImage.getWidth();
 					int height = inputBuffImage.getHeight();
-					BufferedImage outBuffImage = new BufferedImage(width, height,BufferedImage.TYPE_INT_ARGB);
-					
+					BufferedImage outBuffImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
 					WritableRaster imageRaster = inputBuffImage.getRaster();
 					int[] pixelRGBA = new int[4];
-					
+
 					for (int y = 1; y < height - 1; y++) {
 						for (int x = 1; x < width - 1; x++) {
-							
+
 							// get 3-by-3 array of colors in neighborhood
 							int[][] gray = new int[3][3];
 							for (int i = 0; i < 3; i++) {
 								for (int j = 0; j < 3; j++) {
-									
-									//Magic
-									imageRaster.getPixel(x-1+i, y-1+j, pixelRGBA);
-									int r = pixelRGBA[0];
-							        int g = pixelRGBA[1];
-							        int b = pixelRGBA[2];
-							        
-							        
-							        //int lumSum=  (int) (.299*r + .587*g + .114*b);
-							        int lumSum=  (int) (0.2126f*r + 0.7152f*g + 0.0722f*b);//luminosity method				  
 
-							        
-							        gray[i][j] = (int) (Math.round(lumSum));
+									// Magic
+									imageRaster.getPixel(x - 1 + i, y - 1 + j, pixelRGBA);
+									int r = pixelRGBA[0];
+									int g = pixelRGBA[1];
+									int b = pixelRGBA[2];
+
+									// int lumSum= (int) (.299*r + .587*g + .114*b);
+									int lumSum = (int) (0.2126f * r + 0.7152f * g + 0.0722f * b);// luminosity method
+
+									gray[i][j] = (int) (Math.round(lumSum));
 								}
 							}
 
@@ -378,9 +360,10 @@ class Image2RGB {
 								}
 							}
 
-							int magnitude = 255 - truncate((int) Math.sqrt(gray1 * gray1 + gray2 * gray2));//ensure 0-255
-							
-							outBuffImage.setRGB(x, y, getIntFromColor(magnitude,magnitude,magnitude,255));
+							int magnitude = 255 - truncate((int) Math.sqrt(gray1 * gray1 + gray2 * gray2));// ensure
+																											// 0-255
+
+							outBuffImage.setRGB(x, y, getIntFromColor(magnitude, magnitude, magnitude, 255));
 						}
 					}
 
@@ -390,10 +373,10 @@ class Image2RGB {
 
 					openNewFileLocation("Edges");
 				}
-				
+
 			}
 		});
-		
+
 		// -----------------------------------------------------------------
 
 		jExit = new JMenuItem("Exit");
@@ -403,7 +386,7 @@ class Image2RGB {
 				System.exit(0);
 			}
 		});
-		
+
 		// *****************************************************************************************
 
 		jmenuFile.add(jOpen);
@@ -421,17 +404,20 @@ class Image2RGB {
 		jFrame.pack();// this processes the render
 		jFrame.setResizable(true);
 		jFrame.setVisible(true);
-	}//End Image2RGB
+	}// End Image2RGB
 
 	private static int truncate(int a) {
-	    if      (a <   0) return 0;
-	    else if (a > 255) return 255;
-	    else              return a;
+		if (a < 0)
+			return 0;
+		else if (a > 255)
+			return 255;
+		else
+			return a;
 	}
 
 	private void openNewFileLocation(String fileFolderLocation) {
-		
-		if(viewOnJobFinished)
+
+		if (viewOnJobFinished)
 			try {
 				Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
 			} catch (IOException e) {
@@ -448,13 +434,13 @@ class Image2RGB {
 			JOptionPane.showMessageDialog(null, "Failed to create RGB files");
 			e.printStackTrace();
 		}
-		if(replaceWithLastJob) {
+		if (replaceWithLastJob) {
 			jlabelImage.setIcon(new ImageIcon(bufferReader));
-			imageFile = file;	
+			imageFile = file;
 			image = bufferReader;
 			jFrame.pack();
 		}
-		
+
 	}
 
 	private BufferedImage getMainImageBuffered() {
@@ -505,12 +491,12 @@ class Image2RGB {
 	}
 
 	private int getIntFromColor(int R, int G, int B, int A) {
-		//System.out.print(A + " " + R + " " + G + " " + B + " = " );
+		// System.out.print(A + " " + R + " " + G + " " + B + " = " );
 		A = (A << 24) & 0xFF000000;
 		R = (R << 16) & 0x00FF0000;
 		G = (G << 8) & 0x0000FF00;
 		B = B & 0x000000FF;
-		//System.out.println((A | R | G | B));
+		// System.out.println((A | R | G | B));
 		return A | R | G | B;
 	}
 
