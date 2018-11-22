@@ -26,3 +26,6 @@
 1542748790973	Rename local variable 'string'
 1542749058700	Rename method 'generateFileName'
 1542749245171	Rename method 'getMainBuffImage'
+1542881218429	Rename local variable 'picture0'
+1542881361936	Rename local variable 'picture1'
+1542881377257	Rename local variable 'buffInputImage'

@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -41,7 +42,7 @@ class Image2RGB {
 	private JFrame jFrame;
 	private JMenu jmenu;
 	private JMenuBar jbar;
-	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale;
+	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge;
 	private JPanel jpanel;
 	private File imageFile = null;
 	private JLabel jlabelImage;
@@ -246,6 +247,7 @@ class Image2RGB {
 		jGreyScale.setFont(font);
 		jGreyScale.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
+				
 				// If Image selected already
 				if (image == null) {
 					jOpen.doClick();
@@ -254,7 +256,7 @@ class Image2RGB {
 
 					File greyScaleImage = generateFile("Grey_Scale", "Greyscale");
 
-					// convert image to Greyscal version
+					// convert image to Greyscale version
 					BufferedImage buffInputImage = getMainImageBuffered();
 
 					BufferedImage buffOutputImage = new BufferedImage(image.getWidth(), image.getHeight(),
@@ -274,17 +276,95 @@ class Image2RGB {
 		});
 		// -----------------------------------------------------------------
 
-		jExit = new JMenuItem("Exit");
-		jExit.setFont(font);
-		jExit.addActionListener(new ActionListener() {
+		jEdge = new JMenuItem("Edge Detaction");
+		jEdge.setFont(font);
+		jEdge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				System.exit(0);
+				
+				// If Image selected already
+				if (image == null) {
+					jOpen.doClick();
+					jEdge.doClick();
+				} else {
+
+					File edgeImage = generateFile("Edges", "Edges");
+
+					// convert image to Edges version
+					BufferedImage inputBuffImage = getMainImageBuffered();
+					
+					int[][] filter1 = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+
+					int[][] filter2 = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
+
+					int width = inputBuffImage.getWidth();
+					int height = inputBuffImage.getHeight();
+					BufferedImage outBuffImage = new BufferedImage(width, height,BufferedImage.TYPE_INT_ARGB);
+					
+					WritableRaster imageRaster = inputBuffImage.getRaster();
+					int[] pixelRGBA = new int[4];
+					
+					for (int y = 1; y < height - 1; y++) {
+						for (int x = 1; x < width - 1; x++) {
+							
+							// get 3-by-3 array of colors in neighborhood
+							int[][] gray = new int[3][3];
+							for (int i = 0; i < 3; i++) {
+								for (int j = 0; j < 3; j++) {
+									
+									//Magic
+									imageRaster.getPixel(x-1+i, y-1+j, pixelRGBA);
+									int r = pixelRGBA[0];
+							        int g = pixelRGBA[1];
+							        int b = pixelRGBA[2];
+							        
+							        
+							        //int lumSum=  (int) (.299*r + .587*g + .114*b);
+							        int lumSum=  (int) (0.2126f*r + 0.7152f*g + 0.0722f*b);//luminosity method				  
+
+							        
+							        gray[i][j] = (int) (Math.round(lumSum));
+								}
+							}
+
+							// apply filter
+							int gray1 = 0, gray2 = 0;
+							for (int i = 0; i < 3; i++) {
+								for (int j = 0; j < 3; j++) {
+									gray1 += gray[i][j] * filter1[i][j];
+									gray2 += gray[i][j] * filter2[i][j];
+								}
+							}
+
+							int magnitude = 255 - truncate((int) Math.sqrt(gray1 * gray1 + gray2 * gray2));//ensure 0-255
+							
+							outBuffImage.setRGB(x, y, getIntFromColor(magnitude,magnitude,magnitude,255));
+						}
+					}
+
+					savImageFile(outBuffImage, "png", edgeImage);
+
+					JOptionPane.showMessageDialog(null, "All Done");
+
+					openNewFileLocation("Edges");
+				}
+				
 			}
 		});
+		
+		// -----------------------------------------------------------------
+
+				jExit = new JMenuItem("Exit");
+				jExit.setFont(font);
+				jExit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						System.exit(0);
+					}
+				});
 
 		jmenu.add(jOpen);
 		jmenu.add(jRGB);
 		jmenu.add(jGreyScale);
+		jmenu.add(jEdge);
 		jmenu.add(jScale);
 		jmenu.add(jExit);
 		jbar.add(jmenu);
@@ -295,7 +375,13 @@ class Image2RGB {
 		jFrame.setVisible(true);
 	}
 
-	protected void openNewFileLocation(String fileFolderLocation) {
+	private static int truncate(int a) {
+	    if      (a <   0) return 0;
+	    else if (a > 255) return 255;
+	    else              return a;
+	}
+
+	private void openNewFileLocation(String fileFolderLocation) {
 		try {
 			Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
 		} catch (IOException e) {
@@ -304,7 +390,7 @@ class Image2RGB {
 
 	}
 
-	protected void savImageFile(BufferedImage bufferReader, String fileFormat, File file) {
+	private void savImageFile(BufferedImage bufferReader, String fileFormat, File file) {
 		try {
 			ImageIO.write(bufferReader, "png", file);
 		} catch (IOException e) {
@@ -342,6 +428,7 @@ class Image2RGB {
 		File rgb = new File(path + "\\ImageProcessing\\Rgb");
 		File scaled = new File(path + "\\ImageProcessing\\Scaled");
 		File greyScale = new File(path + "\\ImageProcessing\\Grey_Scale");
+		File edges = new File(path + "\\ImageProcessing\\Edges");
 
 		if (!imageProcessing.exists()) {
 			imageProcessing.mkdir();
@@ -355,16 +442,19 @@ class Image2RGB {
 		if (!scaled.exists()) {
 			scaled.mkdir();
 		}
+		if (!edges.exists()) {
+			edges.mkdir();
+		}
 
 	}
 
 	private int getIntFromColor(int R, int G, int B, int A) {
-
+		//System.out.print(A + " " + R + " " + G + " " + B + " = " );
 		A = (A << 24) & 0xFF000000;
 		R = (R << 16) & 0x00FF0000;
 		G = (G << 8) & 0x0000FF00;
 		B = B & 0x000000FF;
-
+		//System.out.println((A | R | G | B));
 		return A | R | G | B;
 	}
 
