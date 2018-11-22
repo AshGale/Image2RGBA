@@ -40,18 +40,15 @@ import javax.swing.text.NumberFormatter;
 
 class Image2RGB {
 	private JFrame jFrame;
-	private JMenu jmenuFile,jmenuSettings;
+	private JMenu jmenu;
 	private JMenuBar jbar;
-	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge,jviewOnFinshed,jreplaceWithLastJob;
+	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge;
 	private JPanel jpanel;
 	private File imageFile = null;
 	private JLabel jlabelImage;
 	private BufferedImage image;
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
-	
-	Boolean viewOnJobFinished = true;
-	Boolean replaceWithLastJob = false;
 
 	Image2RGB() {
 		jFrame = new JFrame("Convert Image to RGB Files");
@@ -80,46 +77,10 @@ class Image2RGB {
 
 		// Creating Menu
 		jbar = new JMenuBar();
-		jmenuFile = new JMenu("File");
-		jmenuSettings = new JMenu("Settings");
+		jmenu = new JMenu("File");
 
-		jmenuFile.setFont(font);
-		jmenuSettings.setFont(font);
+		jmenu.setFont(font);
 
-		// *****************************************************************************************
-		jviewOnFinshed = new JMenuItem("View on Finished");
-		jviewOnFinshed.setFont(font);
-		jviewOnFinshed.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				int inputOption = JOptionPane.showConfirmDialog(null, "Open File Explorer after \"All Done\"?", "View on job finished",
-						JOptionPane.YES_NO_OPTION);
-				if(inputOption == JOptionPane.YES_OPTION) {
-					viewOnJobFinished = true;
-				}
-				else {
-					viewOnJobFinished = false;
-				}
-			}
-		});
-		
-		// -----------------------------------------------------------------
-		jreplaceWithLastJob = new JMenuItem("Load last processed image");
-		jreplaceWithLastJob.setFont(font);
-		jreplaceWithLastJob.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				int inputOption = JOptionPane.showConfirmDialog(null, "Replace the Active image, with the Image just procced?", "Load last processed image",
-						JOptionPane.YES_NO_OPTION);
-				if(inputOption == JOptionPane.YES_OPTION) {
-					replaceWithLastJob = true;
-				}
-				else {
-					replaceWithLastJob = false;
-				}
-			}
-		});
-		
-		// *****************************************************************************************
-		
 		jOpen = new JMenuItem("Open");
 		jOpen.setFont(font);
 		jOpen.addActionListener(new ActionListener() {
@@ -207,7 +168,7 @@ class Image2RGB {
 					savImageFile(buffBlue, "png", blueImg);
 
 					JOptionPane.showMessageDialog(null, "All Done");
-						
+
 					openNewFileLocation("Rgb");
 
 				}
@@ -392,32 +353,27 @@ class Image2RGB {
 		
 		// -----------------------------------------------------------------
 
-		jExit = new JMenuItem("Exit");
-		jExit.setFont(font);
-		jExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				System.exit(0);
-			}
-		});
-		
-		// *****************************************************************************************
+				jExit = new JMenuItem("Exit");
+				jExit.setFont(font);
+				jExit.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent ae) {
+						System.exit(0);
+					}
+				});
 
-		jmenuFile.add(jOpen);
-		jmenuFile.add(jRGB);
-		jmenuFile.add(jGreyScale);
-		jmenuFile.add(jEdge);
-		jmenuFile.add(jScale);
-		jmenuFile.add(jExit);
-		jmenuSettings.add(jreplaceWithLastJob);
-		jmenuSettings.add(jviewOnFinshed);
-		jbar.add(jmenuFile);
-		jbar.add(jmenuSettings);
+		jmenu.add(jOpen);
+		jmenu.add(jRGB);
+		jmenu.add(jGreyScale);
+		jmenu.add(jEdge);
+		jmenu.add(jScale);
+		jmenu.add(jExit);
+		jbar.add(jmenu);
 		jFrame.setJMenuBar(jbar);
 
 		jFrame.pack();// this processes the render
 		jFrame.setResizable(true);
 		jFrame.setVisible(true);
-	}//End Image2RGB
+	}
 
 	private static int truncate(int a) {
 	    if      (a <   0) return 0;
@@ -426,13 +382,11 @@ class Image2RGB {
 	}
 
 	private void openNewFileLocation(String fileFolderLocation) {
-		
-		if(viewOnJobFinished)
-			try {
-				Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -444,13 +398,7 @@ class Image2RGB {
 			JOptionPane.showMessageDialog(null, "Failed to create RGB files");
 			e.printStackTrace();
 		}
-		if(replaceWithLastJob) {
-			jlabelImage.setIcon(new ImageIcon(bufferReader));
-			imageFile = file;	
-			image = bufferReader;
-			jFrame.pack();
-		}
-		
+		jlabelImage.setIcon(new ImageIcon(bufferReader));
 	}
 
 	private BufferedImage getMainImageBuffered() {

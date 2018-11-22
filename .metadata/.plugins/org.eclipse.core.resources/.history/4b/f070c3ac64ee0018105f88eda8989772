@@ -207,7 +207,7 @@ class Image2RGB {
 					savImageFile(buffBlue, "png", blueImg);
 
 					JOptionPane.showMessageDialog(null, "All Done");
-						
+
 					openNewFileLocation("Rgb");
 
 				}
@@ -426,13 +426,11 @@ class Image2RGB {
 	}
 
 	private void openNewFileLocation(String fileFolderLocation) {
-		
-		if(viewOnJobFinished)
-			try {
-				Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		try {
+			Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -444,13 +442,10 @@ class Image2RGB {
 			JOptionPane.showMessageDialog(null, "Failed to create RGB files");
 			e.printStackTrace();
 		}
-		if(replaceWithLastJob) {
-			jlabelImage.setIcon(new ImageIcon(bufferReader));
-			imageFile = file;	
-			image = bufferReader;
-			jFrame.pack();
-		}
-		
+		jlabelImage.setIcon(new ImageIcon(bufferReader));
+		imageFile = file;	
+		image = bufferReader;
+		jFrame.pack();
 	}
 
 	private BufferedImage getMainImageBuffered() {
