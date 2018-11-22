@@ -99,7 +99,6 @@ class Image2RGB {
 				else {
 					viewOnJobFinished = false;
 				}
-				jviewOnFinshed.setText("View on Finished (" + viewOnJobFinished+")");
 				jFrame.pack();
 			}
 		});
@@ -117,7 +116,6 @@ class Image2RGB {
 				else {
 					replaceWithLastJob = false;
 				}
-				jreplaceWithLastJob.setText("Load last processed image (" + replaceWithLastJob+")");
 				jFrame.pack();
 			}
 		});

@@ -87,7 +87,7 @@ class Image2RGB {
 		jmenuSettings.setFont(font);
 
 		// *****************************************************************************************
-		jviewOnFinshed = new JMenuItem("View on Finished (" + viewOnJobFinished+")");
+		jviewOnFinshed = new JMenuItem("View on Finished");
 		jviewOnFinshed.setFont(font);
 		jviewOnFinshed.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -99,13 +99,11 @@ class Image2RGB {
 				else {
 					viewOnJobFinished = false;
 				}
-				jviewOnFinshed.setText("View on Finished (" + viewOnJobFinished+")");
-				jFrame.pack();
 			}
 		});
 		
 		// -----------------------------------------------------------------
-		jreplaceWithLastJob = new JMenuItem("Load last processed image (" + replaceWithLastJob+")");
+		jreplaceWithLastJob = new JMenuItem("Load last processed image");
 		jreplaceWithLastJob.setFont(font);
 		jreplaceWithLastJob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -117,8 +115,6 @@ class Image2RGB {
 				else {
 					replaceWithLastJob = false;
 				}
-				jreplaceWithLastJob.setText("Load last processed image (" + replaceWithLastJob+")");
-				jFrame.pack();
 			}
 		});
 		

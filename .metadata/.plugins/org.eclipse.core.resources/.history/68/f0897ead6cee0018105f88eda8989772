@@ -117,7 +117,7 @@ class Image2RGB {
 				else {
 					replaceWithLastJob = false;
 				}
-				jreplaceWithLastJob.setText("Load last processed image (" + replaceWithLastJob+")");
+				jviewOnFinshed.setText("Load last processed image (" + replaceWithLastJob+")");
 				jFrame.pack();
 			}
 		});
