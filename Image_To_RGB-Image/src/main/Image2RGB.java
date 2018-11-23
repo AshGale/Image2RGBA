@@ -1,16 +1,10 @@
 package main;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.File;
@@ -18,20 +12,9 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.text.NumberFormatter;
+import javax.swing.text.View;
 
 /**
  * 
@@ -40,40 +23,133 @@ import javax.swing.text.NumberFormatter;
 
 class Image2RGB {
 	private JFrame jFrame;
-	private JMenu jmenuFile, jmenuSettings;
+	private JMenu jmenuFile, jmenuSettings, jmenuStitch;
 	private JMenuBar jbar;
-	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge, jviewOnFinshed, jreplaceWithLastJob;
-	private JPanel jpanel;
+	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge, jviewOnFinshed, jreplaceWithLastJob, jstichMode;
+	private JPanel jpanelImage,jpanelStich;
 	private File imageFile = null;
 	private JLabel jlabelImage;
 	private BufferedImage image;
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
 
+	int stichWidth = 4;
+	int stichHeight = 4;
 	Boolean viewOnJobFinished = true;
 	Boolean replaceWithLastJob = false;
+	Boolean inStichMode = false;
+
 
 	Image2RGB() {
 		jFrame = new JFrame("Convert Image to RGB Files");
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jFrame.setLocationByPlatform(true);
-		jFrame.setLayout(new GridBagLayout());
+		jFrame.setLayout(new BorderLayout());
 		jFrame.setMinimumSize(new Dimension(640, 640));
 
-		jpanel = new JPanel();
-		jpanel.setLayout(new BorderLayout());
+		jpanelImage = new JPanel();
+		jpanelImage.setLayout(new BorderLayout());
 		jlabelImage = new JLabel(" ");
-		jpanel.add(jlabelImage, BorderLayout.CENTER);
 
-		jFrame.add(jpanel);
+		jpanelImage.add(jlabelImage, BorderLayout.CENTER);
+		jpanelStich = new JPanel(new GridLayout(stichWidth,stichHeight));
+		JScrollPane scrollFrame = new JScrollPane(jpanelStich);
+		jFrame.add(jpanelImage);
 
 		// Creating Menu
 		jbar = new JMenuBar();
 		jmenuFile = new JMenu("File");
 		jmenuSettings = new JMenu("Settings");
+		jmenuStitch = new JMenu("Stich");
 
 		jmenuFile.setFont(font);
 		jmenuSettings.setFont(font);
+		jmenuStitch.setFont(font);
+
+		jpanelStich.setAutoscrolls(true);
+		// *****************************************************************************************
+
+		// -----------------------------------------------------------------
+		jstichMode = new JMenuItem("Load last processed image (" + inStichMode + ")");
+		jstichMode.setFont(font);
+		jstichMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				inStichMode = !inStichMode;
+				jstichMode.setText("Load last processed image (" + inStichMode + ")");
+
+
+
+				if(inStichMode){
+					//scrollFrame.setPreferredSize(jFrame.getSize());
+					//scrollFrame.set
+					jFrame.remove(jpanelImage);
+					jFrame.add(scrollFrame);
+
+					if(jpanelStich.getHeight() == 0){
+						for(int x = 0; x < stichWidth; x++) {
+							for(int y = 0; y < stichHeight; y++) {
+								JButton button = new JButton(x+", "+y);
+								JLabel jlebel = new JLabel(x+", "+y);
+
+								jlebel.setName(x+","+y);
+								jlebel.addMouseListener(new MouseAdapter() {
+									@Override
+									public void mouseClicked(MouseEvent event) {
+										System.out.println("Yay you clicked me: "+jlebel.getName());
+										JFileChooser fileChooser = new JFileChooser(path);
+										int result = fileChooser.showOpenDialog(null);
+
+										if (result == JFileChooser.APPROVE_OPTION) {
+											try {
+												jlebel.setIcon(new ImageIcon(ImageIO.read(fileChooser.getSelectedFile())));
+												jlebel.setText(null);
+											} catch (Exception e) {
+												JOptionPane.showMessageDialog(null, "Please ensure your selection is an image!");
+												e.printStackTrace();
+											}
+										}
+									}
+								});
+								jpanelStich.add(jlebel);
+
+
+								//////
+//								button.addActionListener(new ActionListener() {
+//									public void actionPerformed(ActionEvent ae) {
+//
+//										JFileChooser fileChooser = new JFileChooser(path);
+//										int result = fileChooser.showOpenDialog(null);
+//
+//										if (result == JFileChooser.APPROVE_OPTION) {
+//											try {
+//												button.setIcon(new ImageIcon(ImageIO.read(fileChooser.getSelectedFile())));
+//
+//											} catch (Exception e) {
+//												JOptionPane.showMessageDialog(null, "Please ensure your selection is an image!");
+//												e.printStackTrace();
+//											}
+//										}
+//									}
+//								});
+//								jpanelStich.add(button);
+							}
+						}
+					}
+					else{
+						System.out.println(jpanelStich);
+						System.out.println(jpanelImage);
+
+					}
+
+					jFrame.pack();// this processes the render
+				}else{
+					jFrame.remove(scrollFrame);
+					jFrame.add(jpanelImage);
+
+					jFrame.pack();// this processes the render
+				}
+			}
+		});
 
 		// *****************************************************************************************
 		jviewOnFinshed = new JMenuItem("View on Finished (" + viewOnJobFinished + ")");
@@ -303,7 +379,7 @@ class Image2RGB {
 		});
 		// -----------------------------------------------------------------
 
-		jEdge = new JMenuItem("Edge Detaction");
+		jEdge = new JMenuItem("Edge Detection");
 		jEdge.setFont(font);
 		jEdge.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -319,9 +395,13 @@ class Image2RGB {
 					// convert image to Edges version
 					BufferedImage inputBuffImage = getMainImageBuffered();
 
-					int[][] filter1 = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+					int[][] filter1 = { { -1, 0, 1 },
+										{ -2, 0, 2 },
+										{ -1, 0, 1 } };
 
-					int[][] filter2 = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
+					int[][] filter2 = { { 1, 2, 1 },
+										{ 0, 0, 0 },
+										{ -1, -2, -1 } };
 
 					int width = inputBuffImage.getWidth();
 					int height = inputBuffImage.getHeight();
@@ -389,6 +469,8 @@ class Image2RGB {
 
 		// *****************************************************************************************
 
+
+
 		jmenuFile.add(jOpen);
 		jmenuFile.add(jRGB);
 		jmenuFile.add(jGreyScale);
@@ -397,8 +479,10 @@ class Image2RGB {
 		jmenuFile.add(jExit);
 		jmenuSettings.add(jreplaceWithLastJob);
 		jmenuSettings.add(jviewOnFinshed);
+		jmenuStitch.add(jstichMode);
 		jbar.add(jmenuFile);
 		jbar.add(jmenuSettings);
+		jbar.add(jmenuStitch);
 		jFrame.setJMenuBar(jbar);
 
 		jFrame.pack();// this processes the render
