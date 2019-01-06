@@ -4,4 +4,6 @@ Simple Application to pick an image and do simpel functions such as the followin
 -Greyscale image
 -Edge Detection
 -Scale to fix or percentage value
+# in progress
+- select a series of images and combine/stich them into on image
 
