@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename local variable &apos;format&apos; in &apos;main.Image2RGB.Image2RGB().new ActionListener() {...}.actionPerformed(...)&apos; to &apos;numberFormat&apos;&#x0D;&#x0A;- Original project: &apos;Image_To_RGB-Image&apos;&#x0D;&#x0A;- Original element: &apos;main.Image2RGB.Image2RGB().new ActionListener() {...}.actionPerformed(ActionEvent).format&apos;&#x0D;&#x0A;- Renamed element: &apos;format&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename local variable &apos;format&apos;" id="org.eclipse.jdt.ui.rename.local.variable" input="/src&lt;main{Image2RGB.java[Image2RGB~Image2RGB[!6~actionPerformed~QActionEvent;@format!10151!10199!10164!10169!QNumberFormat;!0!false" name="numberFormat" references="true" stamp="1546776160494" version="1.0"/>
+</session>

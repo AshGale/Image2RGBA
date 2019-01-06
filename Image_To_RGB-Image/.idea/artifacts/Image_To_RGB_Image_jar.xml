@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Image_To_RGB-Image:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Image_To_RGB_Image_jar</output-path>
+    <root id="archive" name="Image_To_RGB-Image.jar">
+      <element id="module-output" name="Image_To_RGB-Image" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/miglayout-swt-4.2-sources.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -3,6 +3,8 @@ package main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -13,6 +15,8 @@ import java.text.NumberFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
 import javax.swing.text.View;
 
@@ -293,53 +297,136 @@ class Image2RGB {
 					int outputWidth = 0;
 					int outputHeight = 0;
 
-					if (outputHeight == 0 || outputWidth == 0) {
+					int imageWidth = image.getWidth();
+					int imageHeight = image.getHeight();
+					
+					// Get Desired Width and Height
+					NumberFormat numberFormat = NumberFormat.getInstance();
+					numberFormat.setGroupingUsed(false);
+					NumberFormatter formatter = new NumberFormatter(numberFormat);
+					formatter.setValueClass(Integer.class);
+					formatter.setMaximum(65535);
+					formatter.setAllowsInvalid(false);
+					formatter.setCommitsOnValidEdit(true);						
 
-						// Get Desired Width and Height
-						NumberFormat format = NumberFormat.getInstance();
-						format.setGroupingUsed(false);
-						NumberFormatter formatter = new NumberFormatter(format);
-						formatter.setValueClass(Integer.class);
-						formatter.setMaximum(65535);
-						formatter.setAllowsInvalid(false);
-						formatter.setCommitsOnValidEdit(true);
+					JTextField newWidth = new JFormattedTextField(formatter);
+					JTextField newHeight = new JFormattedTextField(formatter);
+					
+					newWidth.setText(""+imageWidth);
+					newHeight.setText(""+imageHeight);
+					
+					//Percent
+//					NumberFormat percentFormat = NumberFormat.getPercentInstance();
+//					numberFormat.setGroupingUsed(false);
+//					NumberFormatter percentFormatter = new NumberFormatter(percentFormat);
+//					percentFormatter.setValueClass(Integer.class);
+//					percentFormatter.setMaximum(65535);
+//					percentFormatter.setAllowsInvalid(false);
+//					percentFormatter.setCommitsOnValidEdit(true);
+					
+					JTextField percentWidth = new JFormattedTextField(formatter);
+					JTextField percentHeight = new JFormattedTextField(formatter);
+					
+					percentWidth.setText("100");
+					percentHeight.setText("100");
 
-						JTextField newWidth = new JFormattedTextField(formatter);
-						JTextField newHeight = new JFormattedTextField(formatter);
-						final JComponent[] inputs = new JComponent[] { new JLabel("Please enter in number format!"),
-								new JLabel("new Width"), newWidth, new JLabel("new Height"), newHeight,
-								new JLabel("current size: " + image.getWidth() + " x " + image.getHeight()) };
-						int result = JOptionPane.showConfirmDialog(null, inputs, "Output Image size",
-								JOptionPane.PLAIN_MESSAGE);
-						if (result == JOptionPane.OK_OPTION) {
+					//TODO add listeners for outputsizes to update percentage
 
-							outputWidth = Integer.parseInt(newWidth.getText());// ensured number format with formatter
-							outputHeight = Integer.parseInt(newHeight.getText());// ensured number format with formatter
-						} else {
-							System.out.println("User canceled / closed the dialog, result = " + result);
+					//Listeners for Percentage
+					percentWidth.getDocument().addDocumentListener(new DocumentListener() {
+						public void changedUpdate(DocumentEvent e) {
+							changed();
 						}
 
+						public void removeUpdate(DocumentEvent e) {
+							changed();
+						}
+
+						public void insertUpdate(DocumentEvent e) {
+							changed();
+						}
+
+						public void changed() {
+							try {
+								float wp = Float.parseFloat(percentWidth.getText());
+								if (wp >= 1) {
+									newWidth.setText("" + Math.round(imageWidth * (wp / 100)));
+								}
+							} catch (NumberFormatException e) {					
+								newWidth.setText("" + imageWidth);								
+							}
+						}
+					});
+					
+					percentHeight.getDocument().addDocumentListener(new DocumentListener() {
+						public void changedUpdate(DocumentEvent e) {
+							changed();
+						}
+
+						public void removeUpdate(DocumentEvent e) {
+							changed();
+						}
+
+						public void insertUpdate(DocumentEvent e) {
+							changed();
+						}
+
+						public void changed() {
+							try {
+								float hp = Float.parseFloat(percentHeight.getText());
+								if (hp >= 1) {
+									newHeight.setText("" + Math.round(imageHeight * (hp / 100)));
+								}
+							} catch (NumberFormatException e) {						
+								newHeight.setText("" + imageHeight);								
+							}
+						}
+					});
+					
+					//newWidth.requestFocusInWindow();
+					
+					final JComponent[] inputs = new JComponent[] {
+							new JLabel("Source Image size: " + image.getWidth() + " x " + image.getHeight()),
+							new JLabel(""),
+							new JLabel("Output Width"), newWidth,
+							new JLabel("Output Height"), newHeight,							
+							new JLabel("Percent Width"), percentWidth,
+							new JLabel("Percent Height"), percentHeight
+					};
+					
+					int result = JOptionPane.showConfirmDialog(null, inputs, "Output Image size",
+							JOptionPane.PLAIN_MESSAGE);
+					
+					if (result == JOptionPane.OK_OPTION) {
+
+						outputWidth = Integer.parseInt(newWidth.getText());// ensured number format with formatter
+						outputHeight = Integer.parseInt(newHeight.getText());// ensured number format with formatter
+					} else {
+						System.out.println("User canceled / closed the dialog scale, result = " + result);
+					}
+
+					if (outputHeight != 0 || outputWidth != 0) {							
+					
+						// Make file and determine file name
+						File outputfile = generateFile("Scaled", "scaled_" + outputWidth + "x" + outputHeight);
+	
+						// convert image to scaled version
+						BufferedImage buffInputImage = getMainImageBuffered();
+	
+						BufferedImage buffOutputImage = new BufferedImage(outputWidth, outputHeight,
+								BufferedImage.TYPE_INT_ARGB);
+	
+						// scales the input image to the output image
+						Graphics2D g2d = buffOutputImage.createGraphics();
+						g2d.drawImage(buffInputImage, 0, 0, outputWidth, outputHeight, null);
+						g2d.dispose();
+	
+						savImageFile(buffOutputImage, "png", outputfile);
+	
+						JOptionPane.showMessageDialog(null, "All Done");
+	
+						openNewFileLocation("Scaled");
 					} // end if output dimensions 0
-
-					// Make file and determine file name
-					File outputfile = generateFile("Scaled", "scaled_" + outputWidth + "x" + outputHeight);
-
-					// convert image to scaled version
-					BufferedImage buffInputImage = getMainImageBuffered();
-
-					BufferedImage buffOutputImage = new BufferedImage(outputWidth, outputHeight,
-							BufferedImage.TYPE_INT_ARGB);
-
-					// scales the input image to the output image
-					Graphics2D g2d = buffOutputImage.createGraphics();
-					g2d.drawImage(buffInputImage, 0, 0, outputWidth, outputHeight, null);
-					g2d.dispose();
-
-					savImageFile(buffOutputImage, "png", outputfile);
-
-					JOptionPane.showMessageDialog(null, "All Done");
-
-					openNewFileLocation("Scaled");
 
 				} // end if image null
 			}
