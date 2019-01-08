@@ -1,10 +1,13 @@
 package main;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -14,12 +17,24 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
-import javax.swing.text.View;
 
 /**
  * 
@@ -38,14 +53,15 @@ class Image2RGB {
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
 
-	int stichWidth = 2;
-	int stichHeight = 3;
+	int stichColumbs = 2;
+	int stichRows = 3;
 	Boolean viewOnJobFinished = true;
 	Boolean replaceWithLastJob = false;
 	Boolean inStichMode = false;
 
 
-	Image2RGB() {
+	Image2RGB() {		
+		
 		jFrame = new JFrame("Convert Image to RGB Files");
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jFrame.setLocationByPlatform(true);
@@ -57,7 +73,7 @@ class Image2RGB {
 		jlabelImage = new JLabel(" ");
 
 		jpanelImage.add(jlabelImage, BorderLayout.CENTER);
-		jpanelStich = new JPanel(new GridLayout(stichWidth,stichHeight));
+		jpanelStich = new JPanel(new GridLayout(stichColumbs,stichRows));
 		JScrollPane scrollFrame = new JScrollPane(jpanelStich);
 		jFrame.add(jpanelImage);
 
@@ -71,10 +87,9 @@ class Image2RGB {
 		jmenuSettings.setFont(font);
 		jmenuStitch.setFont(font);
 		
-		// create a line border with the specified color and width
 		//Border border = BorderFactory.createLineBorder(Color.BLUE, 1);
 
-		jpanelStich.setAutoscrolls(true);
+		jpanelStich.setAutoscrolls(true);		
 		// *****************************************************************************************
 
 		/**
@@ -88,12 +103,12 @@ class Image2RGB {
 		
 		
 		// -----------------------------------------------------------------
-		jstichMode = new JMenuItem("Load last processed image (" + inStichMode + ")");
+		jstichMode = new JMenuItem("Toggle StichMode (" + inStichMode + ")");
 		jstichMode.setFont(font);
 		jstichMode.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				inStichMode = !inStichMode;
-				jstichMode.setText("Load last processed image (" + inStichMode + ")");
+				jstichMode.setText("Toggle StichMode (" + inStichMode + ")");
 
 
 
@@ -103,10 +118,49 @@ class Image2RGB {
 					jFrame.remove(jpanelImage);
 					jFrame.add(scrollFrame);
 
-					if(jpanelStich.getHeight() == 0){
-						for(int x = 0; x < stichWidth; x++) {
-							for(int y = 0; y < stichHeight; y++) {
-								JButton button = new JButton(x+", "+y);
+					//dialog for row & columbs
+					
+					if(jpanelStich.getComponentCount() == 0) {
+					
+						// Get Desired Width and Height
+						NumberFormat numberFormat = NumberFormat.getInstance();
+						numberFormat.setGroupingUsed(false);
+						NumberFormatter formatter = new NumberFormatter(numberFormat);
+						formatter.setValueClass(Integer.class);
+						formatter.setMaximum(65535);
+						formatter.setAllowsInvalid(false);
+						formatter.setCommitsOnValidEdit(true);						
+	
+						JTextField jColumbs = new JFormattedTextField(formatter);
+						JTextField jRows = new JFormattedTextField(formatter);
+	
+						jColumbs.setText("2");
+						jRows.setText("3");
+						
+						final JComponent[] inputs = new JComponent[] {
+								new JLabel("Columbs"), jColumbs,
+								new JLabel("Rows"), jRows
+						};
+						
+						int result = JOptionPane.showConfirmDialog(null, inputs, "Ammount of Rows & Columbs",
+								JOptionPane.PLAIN_MESSAGE);
+						
+						if (result == JOptionPane.OK_OPTION) {
+							if (jColumbs.getText().equals("") || jRows.getText().equals("")) {
+								stichColumbs = 2;
+								stichRows= 3;
+							}
+							else {
+								stichColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with formatter
+								stichRows = Integer.parseInt(jRows.getText());// ensured number format with formatter
+							}
+						} else {
+							System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
+						}
+					
+						//Generate the Stitch Field
+						for(int x = 0; x < stichColumbs; x++) {
+							for(int y = 0; y < stichRows; y++) {
 								JLabel jlebel = new JLabel(x+", "+y);
 
 								jlebel.setName(x+","+y);
@@ -135,13 +189,13 @@ class Image2RGB {
 						}
 					}
 					else{
-						System.out.println(jpanelStich);
-						System.out.println(jpanelImage);
-
+						//Stitch field has components
 					}
 
 					jFrame.pack();// this processes the render
 				}else{
+					
+					//toggle main view
 					jFrame.remove(scrollFrame);
 					jFrame.add(jpanelImage);
 
@@ -309,15 +363,6 @@ class Image2RGB {
 					
 					newWidth.setText(""+imageWidth);
 					newHeight.setText(""+imageHeight);
-					
-					//Percent
-//					NumberFormat percentFormat = NumberFormat.getPercentInstance();
-//					numberFormat.setGroupingUsed(false);
-//					NumberFormatter percentFormatter = new NumberFormatter(percentFormat);
-//					percentFormatter.setValueClass(Integer.class);
-//					percentFormatter.setMaximum(65535);
-//					percentFormatter.setAllowsInvalid(false);
-//					percentFormatter.setCommitsOnValidEdit(true);
 					
 					JTextField percentWidth = new JFormattedTextField(formatter);
 					JTextField percentHeight = new JFormattedTextField(formatter);
