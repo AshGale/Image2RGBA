@@ -15,6 +15,7 @@ import java.text.NumberFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.NumberFormatter;
@@ -37,8 +38,8 @@ class Image2RGB {
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
 
-	int stichWidth = 4;
-	int stichHeight = 4;
+	int stichWidth = 2;
+	int stichHeight = 3;
 	Boolean viewOnJobFinished = true;
 	Boolean replaceWithLastJob = false;
 	Boolean inStichMode = false;
@@ -69,10 +70,23 @@ class Image2RGB {
 		jmenuFile.setFont(font);
 		jmenuSettings.setFont(font);
 		jmenuStitch.setFont(font);
+		
+		// create a line border with the specified color and width
+		//Border border = BorderFactory.createLineBorder(Color.BLUE, 1);
 
 		jpanelStich.setAutoscrolls(true);
 		// *****************************************************************************************
 
+		/**
+		 * Features to add:
+		 * set amount of images to stitch together
+		 * - be able to set eg 2x3 or 6x1
+		 * support small images, ie set min screen size to imageW*2ximageH*3 or imageW*6ximageH*1 respectively
+		 * put scroll on each image for large images
+		 * 
+		 */
+		
+		
 		// -----------------------------------------------------------------
 		jstichMode = new JMenuItem("Load last processed image (" + inStichMode + ")");
 		jstichMode.setFont(font);
@@ -96,6 +110,8 @@ class Image2RGB {
 								JLabel jlebel = new JLabel(x+", "+y);
 
 								jlebel.setName(x+","+y);
+								//jlebel.setBorder(border);
+								
 								jlebel.addMouseListener(new MouseAdapter() {
 									@Override
 									public void mouseClicked(MouseEvent event) {
@@ -115,27 +131,6 @@ class Image2RGB {
 									}
 								});
 								jpanelStich.add(jlebel);
-
-
-								//////
-//								button.addActionListener(new ActionListener() {
-//									public void actionPerformed(ActionEvent ae) {
-//
-//										JFileChooser fileChooser = new JFileChooser(path);
-//										int result = fileChooser.showOpenDialog(null);
-//
-//										if (result == JFileChooser.APPROVE_OPTION) {
-//											try {
-//												button.setIcon(new ImageIcon(ImageIO.read(fileChooser.getSelectedFile())));
-//
-//											} catch (Exception e) {
-//												JOptionPane.showMessageDialog(null, "Please ensure your selection is an image!");
-//												e.printStackTrace();
-//											}
-//										}
-//									}
-//								});
-//								jpanelStich.add(button);
 							}
 						}
 					}
