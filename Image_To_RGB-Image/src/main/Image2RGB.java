@@ -153,6 +153,7 @@ class Image2RGB {
 							else {
 								stichColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with formatter
 								stichRows = Integer.parseInt(jRows.getText());// ensured number format with formatter
+								jpanelStich.setLayout(new GridLayout(stichRows, stichColumbs));
 							}
 						} else {
 							System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
@@ -165,7 +166,7 @@ class Image2RGB {
 
 								jlebel.setName(x+","+y);
 								//jlebel.setBorder(border);
-								
+								System.out.println(stichRows + " x " +stichColumbs + ": " + x+","+y);
 								jlebel.addMouseListener(new MouseAdapter() {
 									@Override
 									public void mouseClicked(MouseEvent event) {
