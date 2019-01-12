@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -55,8 +56,8 @@ class Image2RGB {
 
 	int stitchColumbs = 3;
 	int stitchRows = 2;
-	Boolean viewOnJobFinished = true;
-	Boolean replaceWithLastJob = false;
+	Boolean viewOnJobFinished = false;
+	Boolean replaceWithLastJob = true;
 	Boolean inStitchMode = false;
 
 
@@ -116,11 +117,11 @@ class Image2RGB {
 		jnewStitch.setFont(font);
 		jnewStitch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				
-				if(inStitchMode){
-					if(jpanelStitch.getComponentCount() == 0) {
-						//new stitch grid
-						
+
+				if (inStitchMode) {
+					if (jpanelStitch.getComponentCount() == 0) {
+						// new stitch grid
+
 						// Get Desired Width and Height
 						NumberFormat numberFormat = NumberFormat.getInstance();
 						numberFormat.setGroupingUsed(false);
@@ -128,58 +129,58 @@ class Image2RGB {
 						formatter.setValueClass(Integer.class);
 						formatter.setMaximum(65535);
 						formatter.setAllowsInvalid(false);
-						formatter.setCommitsOnValidEdit(true);						
-	
+						formatter.setCommitsOnValidEdit(true);
+
 						JTextField jColumbs = new JFormattedTextField(formatter);
 						JTextField jRows = new JFormattedTextField(formatter);
-						
-						//default
+
+						// default
 						jColumbs.setText("3");
 						jRows.setText("2");
-						
-						final JComponent[] inputs = new JComponent[] {
-								new JLabel("Columbs"), jColumbs,
-								new JLabel("Rows"), jRows
-						};
-						
+
+						final JComponent[] inputs = new JComponent[] { new JLabel("Columbs"), jColumbs,
+								new JLabel("Rows"), jRows };
+
 						int result = JOptionPane.showConfirmDialog(null, inputs, "Ammount of Rows & Columbs",
 								JOptionPane.PLAIN_MESSAGE);
-						
+
 						if (result == JOptionPane.OK_OPTION) {
 							if (jColumbs.getText().equals("") || jRows.getText().equals("")) {
 								stitchColumbs = 3;
-								stitchRows= 2;
-							}
-							else {
-								stitchColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with formatter
+								stitchRows = 2;
+							} else {
+								stitchColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with
+																						// formatter
 								stitchRows = Integer.parseInt(jRows.getText());// ensured number format with formatter
 								jpanelStitch.setLayout(new GridLayout(stitchRows, stitchColumbs));
 							}
 						} else {
 							System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
 						}
-					
-						//Generate the Stitch Field
-						for(int x = 0; x < stitchColumbs; x++) {
-							for(int y = 0; y < stitchRows; y++) {
-								JLabel jlebel = new JLabel(x+", "+y);
 
-								jlebel.setName(x+","+y);
-								//jlebel.setBorder(border);
-								System.out.println(stitchRows + " x " +stitchColumbs + ": " + x+","+y);
+						// Generate the Stitch Field
+						for (int x = 0; x < stitchColumbs; x++) {
+							for (int y = 0; y < stitchRows; y++) {
+								JLabel jlebel = new JLabel(x + ", " + y);
+
+								jlebel.setName(x + "," + y);
+								// jlebel.setBorder(border);
+								System.out.println(stitchRows + " x " + stitchColumbs + ": " + x + "," + y);
 								jlebel.addMouseListener(new MouseAdapter() {
 									@Override
 									public void mouseClicked(MouseEvent event) {
-										System.out.println("Yay you clicked me: "+jlebel.getName());
+										System.out.println("Yay you clicked me: " + jlebel.getName());
 										JFileChooser fileChooser = new JFileChooser(path);
 										int result = fileChooser.showOpenDialog(null);
 
 										if (result == JFileChooser.APPROVE_OPTION) {
 											try {
-												jlebel.setIcon(new ImageIcon(ImageIO.read(fileChooser.getSelectedFile())));
+												jlebel.setIcon(
+														new ImageIcon(ImageIO.read(fileChooser.getSelectedFile())));
 												jlebel.setText(null);
 											} catch (Exception e) {
-												JOptionPane.showMessageDialog(null, "Please ensure your selection is an image!");
+												JOptionPane.showMessageDialog(null,
+														"Please ensure your selection is an image!");
 												e.printStackTrace();
 											}
 										}
@@ -190,21 +191,17 @@ class Image2RGB {
 						}
 						jFrame.pack();// this processes the render
 					} else {
-						//reset grid
+						// reset grid
 						jpanelStitch.removeAll();
 						jFrame.pack();// this processes the render
 						jnewStitch.doClick();
 					}
-					
-				}else{
-					
-					final JComponent[] inputs = new JComponent[] {
-							new JLabel("Enable StitchMode?")
-					};
-					//prompt enable stitch mode 
-					int result = JOptionPane.showConfirmDialog(null, inputs, "Ammount of Rows & Columbs",
+
+				} else {
+					final JComponent[] inputs = new JComponent[] { new JLabel("Enable StitchMode?") };
+					int result = JOptionPane.showConfirmDialog(null, inputs, "Enable StitchMode?",
 							JOptionPane.PLAIN_MESSAGE);
-					
+
 					if (result == JOptionPane.OK_OPTION) {
 
 						jstitchMode.doClick();
@@ -213,10 +210,8 @@ class Image2RGB {
 					}
 				}
 				jFrame.pack();// this processes the render
-
 			}
-		});	
-		
+		});		
 		
 		// -----------------------------------------------------------------
 
@@ -243,17 +238,111 @@ class Image2RGB {
 					else{
 						//Stitch field has components
 					}
-
 				}else{
 					
 					//toggle main view
 					jFrame.remove(scrollFrame);
 					jFrame.add(jpanelImage);
-
 					jFrame.pack();// this processes the render
 				}
 			}
 		});
+		
+		// -----------------------------------------------------------------
+		
+		jstitchTogether = new JMenuItem("Stitch Image Together");
+		jstitchTogether.setFont(font);
+		jstitchTogether.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				
+				
+				
+				// If no images in stitch grid
+				if (jpanelStitch.getComponentCount() == 0) {
+					final JComponent[] inputs = new JComponent[] { new JLabel("Enable StitchMode?") };
+					int result = JOptionPane.showConfirmDialog(null, inputs, "Enable StitchMode?",
+							JOptionPane.PLAIN_MESSAGE);
+
+					if (result == JOptionPane.OK_OPTION) {
+
+						jstitchMode.doClick();
+					} else {
+						System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
+					}
+				} else {
+ 
+					setupfileStructure();
+					
+					//TO
+					String name = stitchColumbs + "x" + stitchRows;
+					
+					File ouputStitchImage = new File(path + "\\ImageProcessing\\StitchedImages\\" + name + ".png");
+
+					JLabel gridItem = (JLabel)jpanelStitch.getComponent(0);
+	                Icon gridItemIcon = gridItem.getIcon();
+	                	                
+					int imageHeight = gridItem.getHeight();
+					int imageWidth = gridItem.getWidth();
+
+					BufferedImage outBuffImage = new BufferedImage(imageWidth*stitchColumbs, imageHeight*stitchRows, BufferedImage.TYPE_INT_ARGB);
+					BufferedImage itemBuffImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);					
+					
+					Graphics g = itemBuffImage.createGraphics();
+					int[] data = new int[imageWidth*imageHeight];
+					
+					//loop through all images in jpanelStitch
+					for(int items = 0; items <stitchColumbs*stitchRows;items++ ) {
+						System.out.println(items%stitchRows + " " + items%stitchColumbs + " " + data.length);
+						
+						gridItem = (JLabel)jpanelStitch.getComponent(items);
+						gridItemIcon = gridItem.getIcon();						
+						
+						// paint the Icon to the BufferedImage.
+						g = itemBuffImage.createGraphics();
+						gridItemIcon.paintIcon(null, g, 0,0);
+						g.dispose();					
+						
+						WritableRaster imageRaster = itemBuffImage.getRaster();//TODO need icon data
+						int[] pixelRGBA = new int[4];
+						
+						for (int i = 0; i < imageHeight; i++) {
+							for (int j = 0; j < imageWidth; j++) {
+								imageRaster.getPixel(j, i, pixelRGBA);
+								//System.out.println(imageRaster.toString());
+								itemBuffImage.setRGB(j, i, getIntFromColor(pixelRGBA[0], pixelRGBA[1], pixelRGBA[2], pixelRGBA[3]));
+							}
+						}
+						data = itemBuffImage.getRGB(0, 0, imageWidth, imageHeight, null, 0, imageWidth);
+						
+						System.out.println("*--"+items + " " + items*imageWidth + " " + itemBuffImage.getWidth() +" "+ outBuffImage.getWidth());
+						System.out.println("*--"+items + " " + items*imageHeight + " " + itemBuffImage.getHeight() +" "+ outBuffImage.getHeight());
+
+
+						outBuffImage.setRGB(items*imageWidth, items*imageHeight, imageWidth, imageHeight, data, 0, imageWidth);
+
+					}
+					
+					savImageFile(outBuffImage, "png", ouputStitchImage);
+					
+					jstitchMode.doClick();
+//					//toggle main view
+//					jFrame.remove(scrollFrame);
+//					jFrame.add(jpanelImage);
+//					jFrame.pack();// this processes the render
+					
+					JOptionPane.showMessageDialog(null, "All Done");
+
+					openNewFileLocation("Rgb");
+						
+					
+					//new image for export
+				}
+				
+				//save and export
+			}
+		});
+		
+		// -----------------------------------------------------------------
 
 		// *****************************************************************************************
 		jviewOnFinshed = new JMenuItem("View on Finished (" + viewOnJobFinished + ")");
@@ -281,14 +370,6 @@ class Image2RGB {
 		jOpen.setFont(font);
 		jOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				
-				//find check if called from other actionPerformed even.
-				//	fix loop until select valid image file
-				//if(ae.getSource().equals(jEdge))
-//				System.out.println("source is:"+ae.getSource().getClass());
-//				System.out.println("source is:"+ae.getActionCommand());
-//				System.out.println("source is:"+ae.getID());
-//				System.out.println("source is:"+ae.INPUT_METHOD_EVENT_MASK);
 				
 				JFileChooser fileChooser = new JFileChooser(path);
 				int result = fileChooser.showOpenDialog(null);
@@ -421,7 +502,7 @@ class Image2RGB {
 					percentWidth.setText("100");
 					percentHeight.setText("100");
 
-					//TODO add listeners for outputsizes to update percentage
+					//ToDo add listeners for outputsizes to update percentage
 
 					//Listeners for Percentage
 					percentWidth.getDocument().addDocumentListener(new DocumentListener() {
@@ -659,6 +740,7 @@ class Image2RGB {
 		jmenuSettings.add(jviewOnFinshed);
 		jmenuStitch.add(jstitchMode);
 		jmenuStitch.add(jnewStitch);
+		jmenuStitch.add(jstitchTogether);
 		jbar.add(jmenuFile);
 		jbar.add(jmenuSettings);
 		jbar.add(jmenuStitch);
@@ -680,13 +762,13 @@ class Image2RGB {
 
 	private void openNewFileLocation(String fileFolderLocation) {
 
-		if (viewOnJobFinished)
+		if (viewOnJobFinished) {
 			try {
 				Runtime.getRuntime().exec("explorer " + path + "\\ImageProcessing\\" + fileFolderLocation);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
+		}
 	}
 
 	private void savImageFile(BufferedImage bufferReader, String fileFormat, File file) {
@@ -734,6 +816,7 @@ class Image2RGB {
 		File scaled = new File(path + "\\ImageProcessing\\Scaled");
 		File greyScale = new File(path + "\\ImageProcessing\\Grey_Scale");
 		File edges = new File(path + "\\ImageProcessing\\Edges");
+		File stitch = new File(path + "\\ImageProcessing\\StitchedImages");
 
 		if (!imageProcessing.exists()) {
 			imageProcessing.mkdir();
@@ -749,6 +832,9 @@ class Image2RGB {
 		}
 		if (!edges.exists()) {
 			edges.mkdir();
+		}
+		if (!stitch.exists()) {
+			stitch.mkdir();
 		}
 
 	}
