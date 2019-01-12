@@ -45,19 +45,19 @@ class Image2RGB {
 	private JFrame jFrame;
 	private JMenu jmenuFile, jmenuSettings, jmenuStitch;
 	private JMenuBar jbar;
-	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge, jviewOnFinshed, jreplaceWithLastJob, jstichMode;
-	private JPanel jpanelImage,jpanelStich;
+	private JMenuItem jOpen, jExit, jRGB, jScale, jGreyScale, jEdge, jviewOnFinshed, jreplaceWithLastJob, jstitchMode,jnewStitch,jstitchTogether;
+	private JPanel jpanelImage,jpanelStitch;
 	private File imageFile = null;
 	private JLabel jlabelImage;
 	private BufferedImage image;
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
 
-	int stichColumbs = 2;
-	int stichRows = 3;
+	int stitchColumbs = 3;
+	int stitchRows = 2;
 	Boolean viewOnJobFinished = true;
 	Boolean replaceWithLastJob = false;
-	Boolean inStichMode = false;
+	Boolean inStitchMode = false;
 
 
 	Image2RGB() {		
@@ -66,22 +66,22 @@ class Image2RGB {
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jFrame.setLocationByPlatform(true);
 		jFrame.setLayout(new BorderLayout());
-		jFrame.setMinimumSize(new Dimension(640, 640));
+		jFrame.setMinimumSize(new Dimension(320, 320));
 
 		jpanelImage = new JPanel();
 		jpanelImage.setLayout(new BorderLayout());
 		jlabelImage = new JLabel(" ");
 
 		jpanelImage.add(jlabelImage, BorderLayout.CENTER);
-		jpanelStich = new JPanel(new GridLayout(stichColumbs,stichRows));
-		JScrollPane scrollFrame = new JScrollPane(jpanelStich);
+		jpanelStitch = new JPanel(new GridLayout(stitchColumbs,stitchRows));
+		JScrollPane scrollFrame = new JScrollPane(jpanelStitch);
 		jFrame.add(jpanelImage);
 
 		// Creating Menu
 		jbar = new JMenuBar();
 		jmenuFile = new JMenu("File");
 		jmenuSettings = new JMenu("Settings");
-		jmenuStitch = new JMenu("Stich");
+		jmenuStitch = new JMenu("Stitch");
 
 		jmenuFile.setFont(font);
 		jmenuSettings.setFont(font);
@@ -89,39 +89,38 @@ class Image2RGB {
 		
 		//Border border = BorderFactory.createLineBorder(Color.BLUE, 1);
 
-		jpanelStich.setAutoscrolls(true);		
+		jpanelStitch.setAutoscrolls(true);		
 		// *****************************************************************************************
 
 		/**
+		 * 
+		 * add other menu items for new stitch options
+		 * - new stitch
+		 * - stitch image
+		 * - adjust stitch amount
+		 * - small stitch
+		 * 
 		 * Features to add:
 		 * set amount of images to stitch together
 		 * - be able to set eg 2x3 or 6x1
 		 * support small images, ie set min screen size to imageW*2ximageH*3 or imageW*6ximageH*1 respectively
 		 * put scroll on each image for large images
 		 * 
+		 * Add rotate feature
+		 * 
 		 */
 		
 		
 		// -----------------------------------------------------------------
-		jstichMode = new JMenuItem("Toggle StichMode (" + inStichMode + ")");
-		jstichMode.setFont(font);
-		jstichMode.addActionListener(new ActionListener() {
+		jnewStitch = new JMenuItem("Start new Stitch Grid");
+		jnewStitch.setFont(font);
+		jnewStitch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				inStichMode = !inStichMode;
-				jstichMode.setText("Toggle StichMode (" + inStichMode + ")");
-
-
-
-				if(inStichMode){
-					//scrollFrame.setPreferredSize(jFrame.getSize());
-					//scrollFrame.set
-					jFrame.remove(jpanelImage);
-					jFrame.add(scrollFrame);
-
-					//dialog for row & columbs
-					
-					if(jpanelStich.getComponentCount() == 0) {
-					
+				
+				if(inStitchMode){
+					if(jpanelStitch.getComponentCount() == 0) {
+						//new stitch grid
+						
 						// Get Desired Width and Height
 						NumberFormat numberFormat = NumberFormat.getInstance();
 						numberFormat.setGroupingUsed(false);
@@ -133,9 +132,10 @@ class Image2RGB {
 	
 						JTextField jColumbs = new JFormattedTextField(formatter);
 						JTextField jRows = new JFormattedTextField(formatter);
-	
-						jColumbs.setText("2");
-						jRows.setText("3");
+						
+						//default
+						jColumbs.setText("3");
+						jRows.setText("2");
 						
 						final JComponent[] inputs = new JComponent[] {
 								new JLabel("Columbs"), jColumbs,
@@ -147,26 +147,26 @@ class Image2RGB {
 						
 						if (result == JOptionPane.OK_OPTION) {
 							if (jColumbs.getText().equals("") || jRows.getText().equals("")) {
-								stichColumbs = 2;
-								stichRows= 3;
+								stitchColumbs = 3;
+								stitchRows= 2;
 							}
 							else {
-								stichColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with formatter
-								stichRows = Integer.parseInt(jRows.getText());// ensured number format with formatter
-								jpanelStich.setLayout(new GridLayout(stichRows, stichColumbs));
+								stitchColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with formatter
+								stitchRows = Integer.parseInt(jRows.getText());// ensured number format with formatter
+								jpanelStitch.setLayout(new GridLayout(stitchRows, stitchColumbs));
 							}
 						} else {
 							System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
 						}
 					
 						//Generate the Stitch Field
-						for(int x = 0; x < stichColumbs; x++) {
-							for(int y = 0; y < stichRows; y++) {
+						for(int x = 0; x < stitchColumbs; x++) {
+							for(int y = 0; y < stitchRows; y++) {
 								JLabel jlebel = new JLabel(x+", "+y);
 
 								jlebel.setName(x+","+y);
 								//jlebel.setBorder(border);
-								System.out.println(stichRows + " x " +stichColumbs + ": " + x+","+y);
+								System.out.println(stitchRows + " x " +stitchColumbs + ": " + x+","+y);
 								jlebel.addMouseListener(new MouseAdapter() {
 									@Override
 									public void mouseClicked(MouseEvent event) {
@@ -185,15 +185,65 @@ class Image2RGB {
 										}
 									}
 								});
-								jpanelStich.add(jlebel);
+								jpanelStitch.add(jlebel);
 							}
 						}
+						jFrame.pack();// this processes the render
+					} else {
+						//reset grid
+						jpanelStitch.removeAll();
+						jFrame.pack();// this processes the render
+						jnewStitch.doClick();
+					}
+					
+				}else{
+					
+					final JComponent[] inputs = new JComponent[] {
+							new JLabel("Enable StitchMode?")
+					};
+					//prompt enable stitch mode 
+					int result = JOptionPane.showConfirmDialog(null, inputs, "Ammount of Rows & Columbs",
+							JOptionPane.PLAIN_MESSAGE);
+					
+					if (result == JOptionPane.OK_OPTION) {
+
+						jstitchMode.doClick();
+					} else {
+						System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
+					}
+				}
+				jFrame.pack();// this processes the render
+
+			}
+		});	
+		
+		
+		// -----------------------------------------------------------------
+
+		jstitchMode = new JMenuItem("Toggle StitchMode (" + inStitchMode + ")");
+		jstitchMode.setFont(font);
+		jstitchMode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				inStitchMode = !inStitchMode;
+				jstitchMode.setText("Toggle StitchMode (" + inStitchMode + ")");
+
+				if(inStitchMode){
+					//scrollFrame.setPreferredSize(jFrame.getSize());
+					//scrollFrame.set
+					jFrame.remove(jpanelImage);
+					jFrame.add(scrollFrame);
+					jFrame.pack();// this processes the render
+
+					//dialog for row & columbs
+					
+					if(jpanelStitch.getComponentCount() == 0) {
+					
+						jnewStitch.doClick();						
 					}
 					else{
 						//Stitch field has components
 					}
 
-					jFrame.pack();// this processes the render
 				}else{
 					
 					//toggle main view
@@ -607,7 +657,8 @@ class Image2RGB {
 		jmenuFile.add(jExit);
 		jmenuSettings.add(jreplaceWithLastJob);
 		jmenuSettings.add(jviewOnFinshed);
-		jmenuStitch.add(jstichMode);
+		jmenuStitch.add(jstitchMode);
+		jmenuStitch.add(jnewStitch);
 		jbar.add(jmenuFile);
 		jbar.add(jmenuSettings);
 		jbar.add(jmenuStitch);
