@@ -223,6 +223,7 @@ class Image2RGB {
 				jstitchMode.setText("Toggle StitchMode (" + inStitchMode + ")");
 
 				if(inStitchMode){
+
 					//scrollFrame.setPreferredSize(jFrame.getSize());
 					//scrollFrame.set
 					jFrame.remove(jpanelImage);
@@ -237,9 +238,20 @@ class Image2RGB {
 					}
 					else{
 						//Stitch field has components
+						JLabel gridItem = (JLabel)jpanelStitch.getComponent(0);
+		                Icon gridItemIcon = gridItem.getIcon();
+		                Dimension requiredMin = new Dimension(gridItemIcon.getIconWidth()*(stitchWide+1),gridItemIcon.getIconHeight()*(stitchHigh+1));
+		                if( requiredMin.getWidth() < jFrame.getMinimumSize().getWidth() && requiredMin.getHeight() < jFrame.getMinimumSize().getHeight()) {
+		                	jFrame.setMinimumSize(requiredMin);
+							jFrame.setSize(jFrame.getMinimumSize());
+		                }
+		                else {
+		            		jFrame.setMinimumSize(new Dimension(320, 320));
+		                }
+						
 					}
 				}else{
-					
+					System.out.println("here");
 					//toggle main view
 					jFrame.remove(scrollFrame);
 					jFrame.add(jpanelImage);
@@ -283,60 +295,57 @@ class Image2RGB {
 	                	                
 					int imageHeight = gridItemIcon.getIconHeight();
 					int imageWidth = gridItemIcon.getIconWidth();
-					int totalItems = stitchWide*stitchHigh;
+					int countItems = 0;
 
-					BufferedImage outBuffImage = new BufferedImage((imageWidth*stitchWide)*5, (imageHeight*stitchHigh)*5, BufferedImage.TYPE_INT_ARGB);
+					BufferedImage outBuffImage = new BufferedImage(imageWidth*stitchWide, imageHeight*stitchHigh, BufferedImage.TYPE_INT_ARGB);
 					BufferedImage itemBuffImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);					
 					
 					Graphics g = itemBuffImage.createGraphics();
 					int[] data = new int[imageWidth*imageHeight];
 					
-					//loop through all images in jpanelStitch
-					for(int items = 0; items < totalItems;items++ ) {
-						System.out.println(items%stitchWide + " " + items%stitchHigh + " " + items + " " + stitchWide + " " + stitchHigh);
-						System.out.println("---" + items/stitchWide + " : " + items/stitchHigh);
-						gridItem = (JLabel)jpanelStitch.getComponent(items);
-						gridItemIcon = gridItem.getIcon();						
-						
-						// paint the Icon to the BufferedImage.
-						g = itemBuffImage.createGraphics();
-						gridItemIcon.paintIcon(null, g, 0,0);
-						g.dispose();					
-						
-						WritableRaster imageRaster = itemBuffImage.getRaster();//TODO need icon data
-						int[] pixelRGBA = new int[4];
-						
-						for (int i = 0; i < imageHeight; i++) {
-							for (int j = 0; j < imageWidth; j++) {
-								imageRaster.getPixel(j, i, pixelRGBA);
-								//System.out.println(imageRaster.toString());
-								itemBuffImage.setRGB(j, i, getIntFromColor(pixelRGBA[0], pixelRGBA[1], pixelRGBA[2], pixelRGBA[3]));
+					// loop through all images in jpanelStitch
+					for (int high = 0; high < stitchHigh; high++) {
+						for (int wide = 0; wide < stitchWide; wide++) {
+							System.out.println("---" + wide + " : " + high);
+							gridItem = (JLabel) jpanelStitch.getComponent(countItems++);
+							gridItemIcon = gridItem.getIcon();
+							if (gridItemIcon != null) {
+								System.out.println("Image at " + wide + "," + high + " was null");
+
+								// paint the Icon to the BufferedImage.
+								g = itemBuffImage.createGraphics();
+								gridItemIcon.paintIcon(null, g, 0, 0);
+								g.dispose();
+
+								WritableRaster imageRaster = itemBuffImage.getRaster();
+								int[] pixelRGBA = new int[4];
+
+								for (int i = 0; i < imageHeight; i++) {
+									for (int j = 0; j < imageWidth; j++) {
+										imageRaster.getPixel(j, i, pixelRGBA);
+										// System.out.println(imageRaster.toString());
+										itemBuffImage.setRGB(j, i, getIntFromColor(pixelRGBA[0], pixelRGBA[1],
+												pixelRGBA[2], pixelRGBA[3]));
+									}
+								}
+								data = itemBuffImage.getRGB(0, 0, imageWidth, imageHeight, null, 0, imageWidth);
+
+								// System.out.println("*--"+items + " " + items*imageWidth + " " +
+								// itemBuffImage.getWidth() +" "+ outBuffImage.getWidth());
+								// System.out.println("*--"+items + " " + items*imageHeight + " " +
+								// itemBuffImage.getHeight() +" "+ outBuffImage.getHeight());
+
+								outBuffImage.setRGB(wide * imageWidth, high * imageHeight, imageWidth, imageHeight,
+										data, 0, imageWidth);
 							}
 						}
-						data = itemBuffImage.getRGB(0, 0, imageWidth, imageHeight, null, 0, imageWidth);
-						
-						//System.out.println("*--"+items + " " + items*imageWidth + " " + itemBuffImage.getWidth() +" "+ outBuffImage.getWidth());
-						//System.out.println("*--"+items + " " + items*imageHeight + " " + itemBuffImage.getHeight() +" "+ outBuffImage.getHeight());
-						
-
-						outBuffImage.setRGB((items/stitchWide)*imageWidth, (items/stitchHigh)*imageHeight, imageWidth, imageHeight, data, 0, imageWidth);
-
 					}
 					
-					savImageFile(outBuffImage, "png", ouputStitchImage);
-					
 					jstitchMode.doClick();
-//					//toggle main view
-//					jFrame.remove(scrollFrame);
-//					jFrame.add(jpanelImage);
-					jFrame.pack();// this processes the render
-					
+					savImageFile(outBuffImage, "png", ouputStitchImage);
 					JOptionPane.showMessageDialog(null, "All Done");
-
 					openNewFileLocation("Rgb");
-						
-					
-					//new image for export
+					// TODO here :D
 				}
 				
 				//save and export
