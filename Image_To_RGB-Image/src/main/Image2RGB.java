@@ -54,8 +54,8 @@ class Image2RGB {
 	private String path = System.getProperty("user.home") + "\\Pictures";
 	private Font font = new Font("Arial", Font.PLAIN, 18);
 
-	int stitchColumbs = 3;
-	int stitchRows = 2;
+	int stitchWide = 3;
+	int stitchHigh = 2;
 	Boolean viewOnJobFinished = false;
 	Boolean replaceWithLastJob = true;
 	Boolean inStitchMode = false;
@@ -74,7 +74,7 @@ class Image2RGB {
 		jlabelImage = new JLabel(" ");
 
 		jpanelImage.add(jlabelImage, BorderLayout.CENTER);
-		jpanelStitch = new JPanel(new GridLayout(stitchColumbs,stitchRows));
+		jpanelStitch = new JPanel(new GridLayout(stitchWide,stitchHigh));
 		JScrollPane scrollFrame = new JScrollPane(jpanelStitch);
 		jFrame.add(jpanelImage);
 
@@ -146,26 +146,26 @@ class Image2RGB {
 
 						if (result == JOptionPane.OK_OPTION) {
 							if (jColumbs.getText().equals("") || jRows.getText().equals("")) {
-								stitchColumbs = 3;
-								stitchRows = 2;
+								stitchWide = 3;
+								stitchHigh = 2;
 							} else {
-								stitchColumbs = Integer.parseInt(jColumbs.getText());// ensured number format with
+								stitchWide = Integer.parseInt(jColumbs.getText());// ensured number format with
 																						// formatter
-								stitchRows = Integer.parseInt(jRows.getText());// ensured number format with formatter
-								jpanelStitch.setLayout(new GridLayout(stitchRows, stitchColumbs));
+								stitchHigh = Integer.parseInt(jRows.getText());// ensured number format with formatter
+								jpanelStitch.setLayout(new GridLayout(stitchHigh, stitchWide));
 							}
 						} else {
 							System.out.println("User canceled / closed the dialog row & columbs, result = " + result);
 						}
 
 						// Generate the Stitch Field
-						for (int x = 0; x < stitchColumbs; x++) {
-							for (int y = 0; y < stitchRows; y++) {
+						for (int y = 0; y < stitchHigh; y++) {
+							for (int x = 0; x < stitchWide; x++) {
 								JLabel jlebel = new JLabel(x + ", " + y);
 
 								jlebel.setName(x + "," + y);
 								// jlebel.setBorder(border);
-								System.out.println(stitchRows + " x " + stitchColumbs + ": " + x + "," + y);
+								System.out.println(stitchHigh + " x " + stitchWide + ": " + x + "," + y);
 								jlebel.addMouseListener(new MouseAdapter() {
 									@Override
 									public void mouseClicked(MouseEvent event) {
@@ -274,26 +274,27 @@ class Image2RGB {
 					setupfileStructure();
 					
 					//TO
-					String name = stitchColumbs + "x" + stitchRows;
+					String name = stitchWide + "x" + stitchHigh;
 					
 					File ouputStitchImage = new File(path + "\\ImageProcessing\\StitchedImages\\" + name + ".png");
 
 					JLabel gridItem = (JLabel)jpanelStitch.getComponent(0);
 	                Icon gridItemIcon = gridItem.getIcon();
 	                	                
-					int imageHeight = gridItem.getHeight();
-					int imageWidth = gridItem.getWidth();
+					int imageHeight = gridItemIcon.getIconHeight();
+					int imageWidth = gridItemIcon.getIconWidth();
+					int totalItems = stitchWide*stitchHigh;
 
-					BufferedImage outBuffImage = new BufferedImage(imageWidth*stitchColumbs, imageHeight*stitchRows, BufferedImage.TYPE_INT_ARGB);
+					BufferedImage outBuffImage = new BufferedImage((imageWidth*stitchWide)*5, (imageHeight*stitchHigh)*5, BufferedImage.TYPE_INT_ARGB);
 					BufferedImage itemBuffImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);					
 					
 					Graphics g = itemBuffImage.createGraphics();
 					int[] data = new int[imageWidth*imageHeight];
 					
 					//loop through all images in jpanelStitch
-					for(int items = 0; items <stitchColumbs*stitchRows;items++ ) {
-						System.out.println(items%stitchRows + " " + items%stitchColumbs + " " + data.length);
-						
+					for(int items = 0; items < totalItems;items++ ) {
+						System.out.println(items%stitchWide + " " + items%stitchHigh + " " + items + " " + stitchWide + " " + stitchHigh);
+						System.out.println("---" + items/stitchWide + " : " + items/stitchHigh);
 						gridItem = (JLabel)jpanelStitch.getComponent(items);
 						gridItemIcon = gridItem.getIcon();						
 						
@@ -314,11 +315,11 @@ class Image2RGB {
 						}
 						data = itemBuffImage.getRGB(0, 0, imageWidth, imageHeight, null, 0, imageWidth);
 						
-						System.out.println("*--"+items + " " + items*imageWidth + " " + itemBuffImage.getWidth() +" "+ outBuffImage.getWidth());
-						System.out.println("*--"+items + " " + items*imageHeight + " " + itemBuffImage.getHeight() +" "+ outBuffImage.getHeight());
+						//System.out.println("*--"+items + " " + items*imageWidth + " " + itemBuffImage.getWidth() +" "+ outBuffImage.getWidth());
+						//System.out.println("*--"+items + " " + items*imageHeight + " " + itemBuffImage.getHeight() +" "+ outBuffImage.getHeight());
+						
 
-
-						outBuffImage.setRGB(items*imageWidth, items*imageHeight, imageWidth, imageHeight, data, 0, imageWidth);
+						outBuffImage.setRGB((items/stitchWide)*imageWidth, (items/stitchHigh)*imageHeight, imageWidth, imageHeight, data, 0, imageWidth);
 
 					}
 					
@@ -328,7 +329,7 @@ class Image2RGB {
 //					//toggle main view
 //					jFrame.remove(scrollFrame);
 //					jFrame.add(jpanelImage);
-//					jFrame.pack();// this processes the render
+					jFrame.pack();// this processes the render
 					
 					JOptionPane.showMessageDialog(null, "All Done");
 
